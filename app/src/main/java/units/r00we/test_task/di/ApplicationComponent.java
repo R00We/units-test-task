@@ -1,11 +1,11 @@
 package units.r00we.test_task.di;
 
-import javax.inject.Singleton;
-
 import dagger.Component;
-import units.r00we.test_task.ui.MainActivity;
+import units.r00we.test_task.ui.IssueListActivity;
 
-@Component(modules = ApplicationModule.class)
+
+
+@Component(modules = {UIModule.class, NetworkModule.class})
 public interface ApplicationComponent {
-    void inject(MainActivity mainActivity);
+    void inject(IssueListActivity issueListActivity);
 }

@@ -7,7 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-public interface GitHubService {
+public interface ApiService {
     @GET("/repos/{user}/{repo}/issues")
     Single<List<Issue>> getIssueList(@Path("user") String user,
                                      @Path("repo") String repo,

@@ -1,7 +1,5 @@
 package units.r00we.test_task.network;
 
-import java.util.ArrayList;
-
 public class Issue {
     private String url;
     private String repository_url;
@@ -13,13 +11,10 @@ public class Issue {
     private String node_id;
     private float number;
     private String title;
-    private ArrayList<String> labels = new ArrayList<String>();
     private String state;
     private boolean locked;
     private String assignee = null;
     private User user;
-    private ArrayList <String> assignees = new ArrayList <String> ();
-    private String milestone = null;
     private float comments;
     private String created_at;
     private String updated_at;
@@ -81,10 +76,6 @@ public class Issue {
 
     public User getUser() {
         return user;
-    }
-
-    public String getMilestone() {
-        return milestone;
     }
 
     public float getComments() {
