@@ -1,5 +1,7 @@
 package units.r00we.test_task.network;
 
+import java.util.Date;
+
 public class Issue {
     private String url;
     private String repository_url;
@@ -16,9 +18,9 @@ public class Issue {
     private String assignee = null;
     private User user;
     private float comments;
-    private String created_at;
-    private String updated_at;
-    private String closed_at;
+    private Date created_at;
+    private Date updated_at;
+    private Date closed_at;
     private String author_association;
     private String body;
 
@@ -82,15 +84,15 @@ public class Issue {
         return comments;
     }
 
-    public String getCreatedAt() {
+    public Date getCreatedAt() {
         return created_at;
     }
 
-    public String getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updated_at;
     }
 
-    public String getClosedAt() {
+    public Date getClosedAt() {
         return closed_at;
     }
 

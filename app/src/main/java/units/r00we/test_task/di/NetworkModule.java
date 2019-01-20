@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import units.r00we.test_task.Constants;
 import units.r00we.test_task.network.ApiService;
 import units.r00we.test_task.network.Issue;
-import units.r00we.test_task.network.IssuesPositionalDataSource;
+import units.r00we.test_task.network.IssuesDataSource;
 
 @Module
 public class NetworkModule {
@@ -49,7 +49,7 @@ public class NetworkModule {
     @Provides
     @Named("IssueDataSource")
     DataSource.Factory<Integer, Issue> getIssueDataSourceFactory(ApiService apiService, CompositeDisposable compositeDisposable) {
-        return new IssuesPositionalDataSource.Factory(Constants.User, Constants.Repo, apiService, compositeDisposable);
+        return new IssuesDataSource.Factory(Constants.User, Constants.Repo, apiService, compositeDisposable);
     }
 
 

@@ -6,9 +6,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import io.reactivex.disposables.CompositeDisposable;
-import units.r00we.test_task.Constants;
 
-public class IssuesPositionalDataSource extends PageKeyedDataSource<Integer,Issue> {
+public class IssuesDataSource extends PageKeyedDataSource<Integer,Issue> {
 
     //todo реализовать обработку ошибок
 
@@ -18,7 +17,7 @@ public class IssuesPositionalDataSource extends PageKeyedDataSource<Integer,Issu
     private final String repo;
 
 
-    public IssuesPositionalDataSource(String user, String repo, ApiService apiService, CompositeDisposable compositeDisposable) {
+    public IssuesDataSource(String user, String repo, ApiService apiService, CompositeDisposable compositeDisposable) {
         this.apiService = apiService;
         this.compositeDisposable = compositeDisposable;
         this.user = user;
@@ -69,7 +68,7 @@ public class IssuesPositionalDataSource extends PageKeyedDataSource<Integer,Issu
 
         @Override
         public DataSource<Integer, Issue> create() {
-            return new IssuesPositionalDataSource(user, repo, apiService, compositeDisposable);
+            return new IssuesDataSource(user, repo, apiService, compositeDisposable);
         }
     }
 }
