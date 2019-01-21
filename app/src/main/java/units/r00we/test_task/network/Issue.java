@@ -17,7 +17,7 @@ public class Issue {
     private boolean locked;
     private String assignee = null;
     private User user;
-    private float comments;
+    private int comments;
     private Date created_at;
     private Date updated_at;
     private Date closed_at;

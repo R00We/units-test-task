@@ -24,6 +24,7 @@ import units.r00we.test_task.Constants;
 import units.r00we.test_task.R;
 import units.r00we.test_task.network.ApiService;
 import units.r00we.test_task.network.Issue;
+import units.r00we.test_task.utils.DateFormatter;
 
 public class IssueListActivity extends AppCompatActivity {
 
@@ -33,6 +34,8 @@ public class IssueListActivity extends AppCompatActivity {
     RxPagedListBuilder<Integer, Issue> rxPagedListBuilder;
     @Inject
     PagedListAdapter<Issue, IssueAdapter.IssueViewHolder> issueAdapter;
+    @Inject
+    DateFormatter dateFormatter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,7 @@ public class IssueListActivity extends AppCompatActivity {
         compositeDisposable.add(rxPagedListBuilder.buildObservable().subscribe(issueAdapter::submitList));
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        recyclerView.setAdapter(issueAdapter);
+        recyclerView.setAdapter(new GroupByDateAdapter(issueAdapter, dateFormatter));
 
     }
 

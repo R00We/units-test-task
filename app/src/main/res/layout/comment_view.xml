@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:paddingLeft="32dp"
+    android:paddingStart="32dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/commentAuthor"
+        tools:text="emartynov"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/commentText"
+        android:textColor="#5c798b"
+        android:textSize="14sp"
+        tools:text="JakeWharton, another dummy question, how about referencing android.jar from maven central?"
+        />
+
+</LinearLayout>
