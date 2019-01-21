@@ -36,7 +36,7 @@ public class IssueAdapter extends PagedListAdapter<Issue, IssueAdapter.IssueView
         Issue issue = getItem(position);
         if (issue != null) {
             holder.title.setText(issue.getTitle());
-            holder.time.setText(dateFormatter.getHMFromeDate(issue.getCreatedAt()));
+            holder.time.setText(dateFormatter.getHMFromeDate(issue.getUpdatedAt()));
         }
     }
 
