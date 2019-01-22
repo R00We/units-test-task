@@ -25,6 +25,7 @@ import units.r00we.test_task.R;
 import units.r00we.test_task.network.ApiService;
 import units.r00we.test_task.network.Issue;
 import units.r00we.test_task.utils.DateFormatter;
+import units.r00we.test_task.utils.FindFormat;
 
 public class IssueListActivity extends AppCompatActivity {
 
@@ -50,6 +51,8 @@ public class IssueListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setAdapter(new GroupByDateAdapter(issueAdapter, dateFormatter));
 
+        FindFormat.find(System.currentTimeMillis(), this);
+        FindFormat.find(1539734400000L, this);
     }
 
     @Override

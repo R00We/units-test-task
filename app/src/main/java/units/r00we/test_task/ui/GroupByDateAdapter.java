@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -55,7 +56,7 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
                 DateViewHolder dateViewHolder = (DateViewHolder)holder;
                 Date dateItem = (Date)item;
                 //todo реализовать во ViewHolder'ах методы заполнения полей
-                dateViewHolder.dateTextView.setText(DateUtils.getRelativeTimeSpanString(dateItem.getTime(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_ABBREV_MONTH));
+                dateViewHolder.dateTextView.setText(DateUtils.getRelativeTimeSpanString(dateItem.getTime(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS));
             } else {
                 IssueAdapter.IssueViewHolder issueViewHolder = (IssueAdapter.IssueViewHolder)holder;
                 wrappedAdapter.onBindViewHolder(issueViewHolder, wrappedItems.indexOf(item));
@@ -90,11 +91,10 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
 
     private void prepareData(){
         Log.d("GroupByDateAdapter", "start prepareData");
-        //todo попробовать отказаться от generic
         PagedList<Issue> currentPagedList = wrappedAdapter.getCurrentList();
         if (currentPagedList != null && currentPagedList.size() > 0) {
 
-            TreeMap<Date, Set<Issue>>dateItemsMap = new TreeMap<>((date, t1) -> date.compareTo(t1)*-1);
+            Map<Date, Set<Issue>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
 
             allItems.clear();
             wrappedItems.clear();
