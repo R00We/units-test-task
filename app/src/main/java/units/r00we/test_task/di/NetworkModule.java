@@ -36,13 +36,15 @@ public class NetworkModule {
         return new CompositeDisposable();
     }
 
+
+    //todo подумать, скорее всего этот конфиг в UIModule должен быть
     @Provides
     @Named("IssuePagedListConfig")
     PagedList.Config getPagedListConfig(){
         return new PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
                 .setPageSize(30)
-                .setPrefetchDistance(40)
+                .setPrefetchDistance(10)
                 .build();
     }
 

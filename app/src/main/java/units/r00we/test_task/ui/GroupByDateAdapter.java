@@ -4,9 +4,8 @@ import android.arch.paging.PagedList;
 import android.arch.paging.PagedListAdapter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.recyclerview.extensions.AsyncDifferConfig;
-import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +27,8 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
 
     public static final int DATE_HOLDER_TYPE = -1;
     private final PagedListAdapter<Issue, IssueAdapter.IssueViewHolder> wrappedAdapter;
-    private final List<Object> items = new ArrayList<>();
+    private final List<Object> allItems = new ArrayList<>();
+    private final List<Object> wrappedItems = new ArrayList<>();
     private final DateFormatter dateFormatter;
 
     public GroupByDateAdapter(PagedListAdapter<Issue, IssueAdapter.IssueViewHolder> wrappedAdapter, DateFormatter dateFormatter) {
@@ -49,28 +49,28 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
-        Object item = items.get(position);
+        Object item = allItems.get(position);
         if (item != null) {
             if (getItemViewType(position) == DATE_HOLDER_TYPE) {
                 DateViewHolder dateViewHolder = (DateViewHolder)holder;
                 Date dateItem = (Date)item;
-                dateViewHolder.dateTextView.setText(dateItem.toString());
+                //todo реализовать во ViewHolder'ах методы заполнения полей
+                dateViewHolder.dateTextView.setText(DateUtils.getRelativeTimeSpanString(dateItem.getTime(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_ABBREV_MONTH));
             } else {
                 IssueAdapter.IssueViewHolder issueViewHolder = (IssueAdapter.IssueViewHolder)holder;
-                wrappedAdapter.bindViewHolder(issueViewHolder, position);
+                wrappedAdapter.onBindViewHolder(issueViewHolder, wrappedItems.indexOf(item));
             }
         }
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return allItems.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        Object item = items.get(position);
+        Object item = allItems.get(position);
         if (item instanceof Date) {
             return DATE_HOLDER_TYPE;
         } else {
@@ -90,32 +90,36 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
 
     private void prepareData(){
         Log.d("GroupByDateAdapter", "start prepareData");
-        PagedList<Issue> pagedList = wrappedAdapter.getCurrentList();
-        if (pagedList != null) {
-            Log.d("GroupByDateAdapter", "pagedList size - "+pagedList.size());
+        //todo попробовать отказаться от generic
+        PagedList<Issue> currentPagedList = wrappedAdapter.getCurrentList();
+        if (currentPagedList != null && currentPagedList.size() > 0) {
 
-            TreeMap<Date, Set<Issue>> itemMap = new TreeMap<>();
+            TreeMap<Date, Set<Issue>>dateItemsMap = new TreeMap<>((date, t1) -> date.compareTo(t1)*-1);
 
-            items.clear();
+            allItems.clear();
+            wrappedItems.clear();
+            dateItemsMap.clear();
 
-            for (Issue issue : pagedList) {
+            for (Issue issue : currentPagedList) {
                 Date date = dateFormatter.removeTime(issue.getUpdatedAt());
-                Set<Issue> currentSet = itemMap.get(date);
+                Set<Issue> currentSet = dateItemsMap.get(date);
                 if (currentSet == null) {
                     currentSet = new HashSet<>();
-                    itemMap.put(date, currentSet);
+                    dateItemsMap.put(date, currentSet);
                 } else {
-                    currentSet = itemMap.get(date);
+                    currentSet = dateItemsMap.get(date);
                 }
                 currentSet.add(issue);
+                wrappedItems.add(issue);
             }
 
-            for (Date date : itemMap.keySet()) {
-                items.add(date);
-                items.addAll(itemMap.get(date));
+            for (Date date : dateItemsMap.keySet()) {
+                allItems.add(date);
+                allItems.addAll(dateItemsMap.get(date));
             }
+            notifyDataSetChanged();
         }
-        notifyDataSetChanged();
+
     }
 
 
