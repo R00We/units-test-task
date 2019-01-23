@@ -38,7 +38,14 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
         @Override
         public void onItemRangeInserted(int positionStart, int itemCount) {
             super.onItemRangeInserted(positionStart, itemCount);
-            prepareData();
+            PagedList pagedList = wrappedAdapter.getCurrentList();
+            if (pagedList != null && pagedList.size() > 0)  {
+                Object startItem = pagedList.get(positionStart);
+                Object lastItem = pagedList.get(positionStart+itemCount);
+                prepareData();
+
+            }
+
         }
 
     };
