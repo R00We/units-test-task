@@ -1,28 +1,17 @@
 package units.r00we.test_task.ui;
 
-import android.arch.paging.DataSource;
-import android.arch.paging.PagedList;
 import android.arch.paging.PagedListAdapter;
 import android.arch.paging.RxPagedListBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import java.util.List;
-import java.util.concurrent.Executors;
-
 import javax.inject.Inject;
-import javax.inject.Named;
 
-import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import units.r00we.test_task.App;
-import units.r00we.test_task.Constants;
 import units.r00we.test_task.R;
-import units.r00we.test_task.network.ApiService;
 import units.r00we.test_task.network.Issue;
 import units.r00we.test_task.utils.DateFormatter;
 import units.r00we.test_task.utils.FindFormat;
@@ -51,8 +40,6 @@ public class IssueListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setAdapter(new GroupByDateAdapter(issueAdapter, dateFormatter));
 
-        FindFormat.find(System.currentTimeMillis(), this);
-        FindFormat.find(1539734400000L, this);
     }
 
     @Override

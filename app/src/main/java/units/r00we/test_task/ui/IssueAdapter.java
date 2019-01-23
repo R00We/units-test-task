@@ -12,8 +12,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import units.r00we.test_task.R;
 import units.r00we.test_task.network.Issue;
 import units.r00we.test_task.utils.DateFormatter;

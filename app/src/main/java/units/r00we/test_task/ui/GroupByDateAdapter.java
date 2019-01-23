@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,17 +23,31 @@ import units.r00we.test_task.R;
 import units.r00we.test_task.network.Issue;
 import units.r00we.test_task.utils.DateFormatter;
 
+import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
+
 public class GroupByDateAdapter extends RecyclerView.Adapter {
 
     public static final int DATE_HOLDER_TYPE = -1;
     private final PagedListAdapter<Issue, IssueAdapter.IssueViewHolder> wrappedAdapter;
     private final List<Object> allItems = new ArrayList<>();
     private final List<Object> wrappedItems = new ArrayList<>();
-    private final DateFormatter dateFormatter;
+    private final DateFormatter dateUtils;
 
-    public GroupByDateAdapter(PagedListAdapter<Issue, IssueAdapter.IssueViewHolder> wrappedAdapter, DateFormatter dateFormatter) {
+    private final RecyclerView.AdapterDataObserver wrappedAdapterObserver = new RecyclerView.AdapterDataObserver() {
+
+        @Override
+        public void onItemRangeInserted(int positionStart, int itemCount) {
+            super.onItemRangeInserted(positionStart, itemCount);
+            prepareData();
+        }
+
+    };
+    @Nullable
+    private RecyclerView.AdapterDataObserver adapterDataObserver = null;
+
+    public GroupByDateAdapter(PagedListAdapter<Issue, IssueAdapter.IssueViewHolder> wrappedAdapter, DateFormatter dateUtils) {
         this.wrappedAdapter = wrappedAdapter;
-        this.dateFormatter = dateFormatter;
+        this.dateUtils = dateUtils;
     }
 
     @NonNull
@@ -55,8 +68,7 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
             if (getItemViewType(position) == DATE_HOLDER_TYPE) {
                 DateViewHolder dateViewHolder = (DateViewHolder)holder;
                 Date dateItem = (Date)item;
-                //todo реализовать во ViewHolder'ах методы заполнения полей
-                dateViewHolder.dateTextView.setText(DateUtils.getRelativeTimeSpanString(dateItem.getTime(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS));
+                dateViewHolder.fill(dateItem);
             } else {
                 IssueAdapter.IssueViewHolder issueViewHolder = (IssueAdapter.IssueViewHolder)holder;
                 wrappedAdapter.onBindViewHolder(issueViewHolder, wrappedItems.indexOf(item));
@@ -90,18 +102,16 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
     }
 
     private void prepareData(){
-        Log.d("GroupByDateAdapter", "start prepareData");
         PagedList<Issue> currentPagedList = wrappedAdapter.getCurrentList();
         if (currentPagedList != null && currentPagedList.size() > 0) {
 
             Map<Date, Set<Issue>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
-
             allItems.clear();
             wrappedItems.clear();
             dateItemsMap.clear();
 
             for (Issue issue : currentPagedList) {
-                Date date = dateFormatter.removeTime(issue.getUpdatedAt());
+                Date date = dateUtils.removeTime(issue.getUpdatedAt());
                 Set<Issue> currentSet = dateItemsMap.get(date);
                 if (currentSet == null) {
                     currentSet = new HashSet<>();
@@ -119,74 +129,38 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
             }
             notifyDataSetChanged();
         }
-
     }
-
 
     @Override
     public void registerAdapterDataObserver(@NonNull RecyclerView.AdapterDataObserver observer) {
         super.registerAdapterDataObserver(observer);
-        wrappedAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                Log.d("GroupByDateAdapter", "onChanged");
-                prepareData();
-            }
-
-            @Override
-            public void onItemRangeChanged(int positionStart, int itemCount) {
-                super.onItemRangeChanged(positionStart, itemCount);
-                Log.d("GroupByDateAdapter", "onItemRangeChanged");
-                prepareData();
-            }
-
-            @Override
-            public void onItemRangeChanged(int positionStart, int itemCount, @Nullable Object payload) {
-                super.onItemRangeChanged(positionStart, itemCount, payload);
-                Log.d("GroupByDateAdapter", "onItemRangeChanged");
-                prepareData();
-            }
-
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                Log.d("GroupByDateAdapter", "onItemRangeInserted positionStart - "+positionStart+" itemCount - "+itemCount);
-                prepareData();
-            }
-
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                super.onItemRangeRemoved(positionStart, itemCount);
-                Log.d("GroupByDateAdapter", "onItemRangeRemoved");
-                prepareData();
-            }
-
-            @Override
-            public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-                super.onItemRangeMoved(fromPosition, toPosition, itemCount);
-                Log.d("GroupByDateAdapter", "onItemRangeMoved");
-                prepareData();
-            }
-        });
-
+        adapterDataObserver = observer;
+        wrappedAdapter.registerAdapterDataObserver(wrappedAdapterObserver);
     }
 
     @Override
     public void unregisterAdapterDataObserver(@NonNull RecyclerView.AdapterDataObserver observer) {
         super.unregisterAdapterDataObserver(observer);
-        //todo unregister on wrappedAdapter
-
+        wrappedAdapter.unregisterAdapterDataObserver(wrappedAdapterObserver);
+        adapterDataObserver = null;
     }
 
     static final class DateViewHolder extends RecyclerView.ViewHolder{
 
         private TextView dateTextView;
 
-        public DateViewHolder(View itemView) {
+        private DateViewHolder(View itemView) {
             super(itemView);
             dateTextView = itemView.findViewById(R.id.dateTextView);
         }
+
+        void fill(Date date){
+            dateTextView.setText(DateUtils.getRelativeTimeSpanString(date.getTime(),
+                    System.currentTimeMillis(),
+                    DateUtils.DAY_IN_MILLIS, FORMAT_SHOW_DATE));
+
+        }
+
 
 
     }
