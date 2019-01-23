@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +25,12 @@ import units.r00we.test_task.utils.DateFormatter;
 
 import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
 
+
+/**
+ * Адаптер оборачивает другой адаптер с сущностями Issue и выводит дату перед первым issue из текущего дня
+ * Сейчас адаптер расчитан только но последоватеьное добавление новых элементов в конец списка.
+ * Манипуляции с добавление не в конец списка и другие могут привести к неправильному показу элементов.
+ */
 public class GroupByDateAdapter extends RecyclerView.Adapter {
 
     public static final int DATE_HOLDER_TYPE = -1;
@@ -36,16 +42,15 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
     private final RecyclerView.AdapterDataObserver wrappedAdapterObserver = new RecyclerView.AdapterDataObserver() {
 
         @Override
-        public void onItemRangeInserted(int positionStart, int itemCount) {
-            super.onItemRangeInserted(positionStart, itemCount);
-            PagedList pagedList = wrappedAdapter.getCurrentList();
-            if (pagedList != null && pagedList.size() > 0)  {
-                Object startItem = pagedList.get(positionStart);
-                Object lastItem = pagedList.get(positionStart+itemCount);
+        public void onItemRangeInserted(int wrappedPositionStart, int wrappedItemCount) {
+            super.onItemRangeInserted(wrappedPositionStart, wrappedItemCount);
+
+                int positionStart = allItems.size();
                 prepareData();
-
-            }
-
+                int itemCount = allItems.size() - positionStart;
+                if (adapterDataObserver != null) {
+                    adapterDataObserver.onItemRangeInserted(positionStart, itemCount);
+                }
         }
 
     };
@@ -115,16 +120,13 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
             Map<Date, Set<Issue>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
             allItems.clear();
             wrappedItems.clear();
-            dateItemsMap.clear();
 
             for (Issue issue : currentPagedList) {
                 Date date = dateUtils.removeTime(issue.getUpdatedAt());
                 Set<Issue> currentSet = dateItemsMap.get(date);
                 if (currentSet == null) {
-                    currentSet = new HashSet<>();
+                    currentSet = new LinkedHashSet<>();
                     dateItemsMap.put(date, currentSet);
-                } else {
-                    currentSet = dateItemsMap.get(date);
                 }
                 currentSet.add(issue);
                 wrappedItems.add(issue);
@@ -134,7 +136,6 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
                 allItems.add(date);
                 allItems.addAll(dateItemsMap.get(date));
             }
-            notifyDataSetChanged();
         }
     }
 
@@ -154,14 +155,14 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
 
     static final class DateViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView dateTextView;
+        private final TextView dateTextView;
 
         private DateViewHolder(View itemView) {
             super(itemView);
             dateTextView = itemView.findViewById(R.id.dateTextView);
         }
 
-        void fill(Date date){
+        void fill(@NonNull Date date){
             dateTextView.setText(DateUtils.getRelativeTimeSpanString(date.getTime(),
                     System.currentTimeMillis(),
                     DateUtils.DAY_IN_MILLIS, FORMAT_SHOW_DATE));

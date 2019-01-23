@@ -35,11 +35,16 @@ public class IssueListActivity extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
 
-        compositeDisposable.add(rxPagedListBuilder.buildObservable().subscribe(issueAdapter::submitList));
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        //todo что с di тут?
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new GroupByDateAdapter(issueAdapter, dateFormatter));
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        compositeDisposable.add(rxPagedListBuilder.buildObservable().subscribe(issueAdapter::submitList));
     }
 
     @Override
