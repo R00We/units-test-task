@@ -80,7 +80,7 @@ public class Issue {
         return user;
     }
 
-    public float getComments() {
+    public int getComments() {
         return comments;
     }
 

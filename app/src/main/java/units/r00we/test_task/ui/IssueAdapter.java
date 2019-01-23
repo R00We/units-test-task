@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,11 @@ import android.widget.TextView;
 
 import units.r00we.test_task.R;
 import units.r00we.test_task.network.Issue;
+import units.r00we.test_task.utils.CommentDiffUtilItemCallback;
 import units.r00we.test_task.utils.DateFormatter;
+import units.r00we.test_task.utils.IssueDiffUtilItemCallback;
+
+import static android.text.format.DateUtils.FORMAT_SHOW_TIME;
 
 public class IssueAdapter extends PagedListAdapter<Issue, IssueAdapter.IssueViewHolder> {
 
@@ -41,37 +46,7 @@ public class IssueAdapter extends PagedListAdapter<Issue, IssueAdapter.IssueView
     public void onBindViewHolder(@NonNull IssueViewHolder holder, int position) {
         Issue issue = getItem(position);
         if (issue != null) {
-            holder.title.setText(issue.getTitle());
-            holder.time.setText(dateFormatter.getHMFromeDate(issue.getUpdatedAt()));
-
-            holder.commentsRecyclerView.setAdapter(new RecyclerView.Adapter() {
-                @NonNull
-                @Override
-                public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_view, parent, false);
-                    return new CommentViewHolder(view);
-                }
-
-                @Override
-                public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-                    CommentViewHolder commentViewHolder = (CommentViewHolder)holder;
-                    commentViewHolder.author.setText("JakeWharton");
-                    commentViewHolder.coment.setText("JakeWharton, another dummy question, how about referencing android.jar from maven central?");
-                }
-
-                @Override
-                public int getItemCount() {
-                    return 1;
-                }
-            });
-
-
-
-            if (issue.getComments() < 3) {
-                holder.showMoreButton.setVisibility(View.GONE);
-            } else {
-                holder.showMoreButton.setVisibility(View.VISIBLE);
-            }
+            holder.fill(issue);
         }
     }
 
@@ -92,6 +67,9 @@ public class IssueAdapter extends PagedListAdapter<Issue, IssueAdapter.IssueView
         private final Button showMoreButton;
         private final RecyclerView commentsRecyclerView;
 
+        //todo завязываемся на реализацию, не по solid
+        private final CommentsAdapter commentsAdapter;
+
         IssueViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.issueTitle);
@@ -99,19 +77,29 @@ public class IssueAdapter extends PagedListAdapter<Issue, IssueAdapter.IssueView
             showMoreButton = itemView.findViewById(R.id.moreCommentsButton);
             commentsRecyclerView = itemView.findViewById(R.id.commentsRecyclerView);
             commentsRecyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
+            commentsAdapter = new CommentsAdapter(new CommentDiffUtilItemCallback(), 3);
+            commentsRecyclerView.setAdapter(commentsAdapter);
+
+            showMoreButton.setOnClickListener(v -> {
+                if (commentsAdapter.isCollapsed()) {
+                    commentsAdapter.expandComments();
+                } else {
+                    commentsAdapter.collapseComments();
+                }
+            });
         }
-    }
 
+        void fill(Issue issue) {
+            title.setText(issue.getTitle());
+            time.setText(DateUtils.formatDateTime(time.getContext(), issue.getUpdatedAt().getTime(), FORMAT_SHOW_TIME));
+            commentsAdapter.setCommentsSize(issue.getComments());
+            commentsAdapter.collapseComments();
 
-
-    public static class CommentViewHolder extends RecyclerView.ViewHolder {
-        private final TextView author;
-        private final TextView coment;
-
-        public CommentViewHolder(View itemView) {
-            super(itemView);
-            author = itemView.findViewById(R.id.commentAuthor);
-            coment = itemView.findViewById(R.id.commentText);
+            if (issue.getComments() < 3) {
+                showMoreButton.setVisibility(View.GONE);
+            } else {
+                showMoreButton.setVisibility(View.VISIBLE);
+            }
         }
     }
 }
