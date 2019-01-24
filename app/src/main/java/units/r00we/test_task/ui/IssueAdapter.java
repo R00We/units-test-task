@@ -14,7 +14,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import javax.inject.Inject;
+
+import io.reactivex.disposables.CompositeDisposable;
+import units.r00we.test_task.App;
+import units.r00we.test_task.Constants;
 import units.r00we.test_task.R;
+import units.r00we.test_task.network.ApiService;
 import units.r00we.test_task.network.Comment;
 import units.r00we.test_task.network.CommentsDataSource;
 import units.r00we.test_task.network.Issue;
@@ -70,26 +76,24 @@ public class IssueAdapter extends PagedListAdapter<Issue, IssueAdapter.IssueView
         private final Button showMoreButton;
         private final RecyclerView commentsRecyclerView;
 
+        ApiService apiService;
+
+        @Inject
+        CompositeDisposable compositeDisposable;
         //todo завязываемся на реализацию, не по solid
         private final CommentsAdapter commentsAdapter;
 
         IssueViewHolder(View itemView) {
             super(itemView);
+
+            apiService =((App)itemView.getContext().getApplicationContext()).getApplicationModule().getApiService();
             title = itemView.findViewById(R.id.issueTitle);
             time = itemView.findViewById(R.id.issueTime);
             showMoreButton = itemView.findViewById(R.id.moreCommentsButton);
             commentsRecyclerView = itemView.findViewById(R.id.commentsRecyclerView);
             commentsRecyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
 
-
-            CommentsDataSource.Factory factory = new CommentsDataSource.Factory();
-            RxPagedListBuilder<Integer, Comment> rxPagedListBuilder = new RxPagedListBuilder<>();
-            commentsAdapter = new CommentsAdapter(new CommentDiffUtilItemCallback(), 3);
-
-
-
-
-
+            commentsAdapter = new CommentsAdapter(3, apiService);
             commentsRecyclerView.setAdapter(commentsAdapter);
 
             showMoreButton.setOnClickListener(v -> {
@@ -106,6 +110,7 @@ public class IssueAdapter extends PagedListAdapter<Issue, IssueAdapter.IssueView
             time.setText(DateUtils.formatDateTime(time.getContext(), issue.getUpdatedAt().getTime(), FORMAT_SHOW_TIME));
             commentsAdapter.setCommentsSize(issue.getComments());
             commentsAdapter.collapseComments();
+            commentsAdapter.setIssue(issue);
 
             if (issue.getComments() < 3) {
                 showMoreButton.setVisibility(View.GONE);

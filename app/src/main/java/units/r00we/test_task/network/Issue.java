@@ -9,9 +9,9 @@ public class Issue {
     private String comments_url;
     private String events_url;
     private String html_url;
-    private float id;
+    private int id;
     private String node_id;
-    private float number;
+    private int number;
     private String title;
     private String state;
     private boolean locked;
@@ -48,7 +48,7 @@ public class Issue {
         return html_url;
     }
 
-    public float getId() {
+    public int getId() {
         return id;
     }
 
@@ -56,7 +56,7 @@ public class Issue {
         return node_id;
     }
 
-    public float getNumber() {
+    public int getNumber() {
         return number;
     }
 

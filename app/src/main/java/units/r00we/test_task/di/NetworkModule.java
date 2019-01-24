@@ -61,25 +61,4 @@ public class NetworkModule {
         return new RxPagedListBuilder<>(dataSourceFactory, pagedListConfig);
     }
 
-    @Provides
-    @Named("IssuePagedListConfig")
-    PagedList.Config getCommentPagedListConfig(){
-        return new PagedList.Config.Builder()
-                .setPageSize(30)
-                .build();
-    }
-
-    @Provides
-    @Named("IssueDataSource")
-    DataSource.Factory<Integer, Issue> getIssueDataSourceFactory(ApiService apiService, CompositeDisposable compositeDisposable) {
-        return new IssuesDataSource.Factory(Constants.User, Constants.Repo, apiService, compositeDisposable);
-    }
-
-
-    @Provides
-    RxPagedListBuilder<Integer, Issue> getRxPagedListBuilder(@Named("IssueDataSource") DataSource.Factory<Integer, Issue>  dataSourceFactory,
-                                                             @Named("IssuePagedListConfig") PagedList.Config pagedListConfig) {
-        return new RxPagedListBuilder<>(dataSourceFactory, pagedListConfig);
-    }
-
 }

@@ -6,39 +6,47 @@ import android.support.annotation.Nullable;
 import android.support.v7.recyclerview.extensions.AsyncDifferConfig;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import units.r00we.test_task.Constants;
 import units.r00we.test_task.R;
+import units.r00we.test_task.network.ApiService;
 import units.r00we.test_task.network.Comment;
 import units.r00we.test_task.network.Issue;
 
-public class CommentsAdapter extends PagedListAdapter<Comment, CommentsAdapter.CommentViewHolder> {
+public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder> {
 
     @Nullable
     private Issue issue;
     private int collapsedSize;
     private boolean isCollapsed = false;
     private int commentsSize = 0;
+    private final ApiService apiService;
 
-    public CommentsAdapter(@NonNull DiffUtil.ItemCallback<Comment> diffCallback,
-                           int collapsedSize) {
-        super(diffCallback);
-        this.collapsedSize = collapsedSize;
-    }
+    private List<Comment> commentList = new ArrayList<>();
 
-    public CommentsAdapter(@NonNull AsyncDifferConfig<Comment> config,
-                           int collapsedSize) {
-        super(config);
+    public CommentsAdapter(int collapsedSize, ApiService apiService) {
         this.collapsedSize = collapsedSize;
+        this.apiService = apiService;
     }
 
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
-        holder.author.setText("JakeWharton");
-        holder.coment.setText("JakeWharton, another dummy question, how about referencing android.jar from maven central?");
+        if (commentList.size() > position) {
+            Comment comment = commentList.get(position);
+            holder.author.setText(comment.getCreatedAt());
+            holder.coment.setText(comment.getBody());
+        } else {
+            holder.author.setText("Loading");
+            holder.coment.setText("...");
+        }
     }
 
     @NonNull
@@ -64,6 +72,24 @@ public class CommentsAdapter extends PagedListAdapter<Comment, CommentsAdapter.C
         } else {
             return commentsSize;
         }
+    }
+
+    public void setIssue(@NonNull Issue issue) {
+        this.issue = issue;
+        loadComments(issue);
+    }
+
+    private void loadComments(@NonNull Issue issue) {
+        apiService.getCommentList(Constants.User, Constants.Repo, issue.getNumber())
+                .subscribe((comments, throwable) -> {
+                    if (comments != null) {
+                        commentList.addAll(comments);
+                        commentsSize = commentList.size();
+                        recalculateSizeAndNotify();
+                    } else {
+                        Log.d("loadComments", throwable.getMessage());
+                    }
+                });
     }
 
     public boolean isCollapsed() {
