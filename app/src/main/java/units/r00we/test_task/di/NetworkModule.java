@@ -40,11 +40,32 @@ public class NetworkModule {
     //todo подумать, скорее всего этот конфиг в UIModule должен быть
     @Provides
     @Named("IssuePagedListConfig")
-    PagedList.Config getPagedListConfig(){
+    PagedList.Config getIssuePagedListConfig(){
         return new PagedList.Config.Builder()
                 .setEnablePlaceholders(false)
                 .setPageSize(30)
                 .setPrefetchDistance(10)
+                .build();
+    }
+
+    @Provides
+    @Named("IssueDataSource")
+    DataSource.Factory<Integer, Issue> getIssueDIssueDataSourceFactory(ApiService apiService, CompositeDisposable compositeDisposable) {
+        return new IssuesDataSource.Factory(Constants.User, Constants.Repo, apiService, compositeDisposable);
+    }
+
+
+    @Provides
+    RxPagedListBuilder<Integer, Issue> getCommentRxPagedListBuilder(@Named("IssueDataSource") DataSource.Factory<Integer, Issue>  dataSourceFactory,
+                                             @Named("IssuePagedListConfig") PagedList.Config pagedListConfig) {
+        return new RxPagedListBuilder<>(dataSourceFactory, pagedListConfig);
+    }
+
+    @Provides
+    @Named("IssuePagedListConfig")
+    PagedList.Config getCommentPagedListConfig(){
+        return new PagedList.Config.Builder()
+                .setPageSize(30)
                 .build();
     }
 
@@ -57,7 +78,7 @@ public class NetworkModule {
 
     @Provides
     RxPagedListBuilder<Integer, Issue> getRxPagedListBuilder(@Named("IssueDataSource") DataSource.Factory<Integer, Issue>  dataSourceFactory,
-                                             @Named("IssuePagedListConfig") PagedList.Config pagedListConfig) {
+                                                             @Named("IssuePagedListConfig") PagedList.Config pagedListConfig) {
         return new RxPagedListBuilder<>(dataSourceFactory, pagedListConfig);
     }
 

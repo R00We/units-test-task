@@ -2,6 +2,7 @@ package units.r00we.test_task.ui;
 
 import android.arch.paging.PagedList;
 import android.arch.paging.PagedListAdapter;
+import android.arch.paging.RxPagedListBuilder;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import units.r00we.test_task.R;
+import units.r00we.test_task.network.Comment;
+import units.r00we.test_task.network.CommentsDataSource;
 import units.r00we.test_task.network.Issue;
 import units.r00we.test_task.utils.CommentDiffUtilItemCallback;
 import units.r00we.test_task.utils.DateFormatter;
@@ -77,7 +80,16 @@ public class IssueAdapter extends PagedListAdapter<Issue, IssueAdapter.IssueView
             showMoreButton = itemView.findViewById(R.id.moreCommentsButton);
             commentsRecyclerView = itemView.findViewById(R.id.commentsRecyclerView);
             commentsRecyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
+
+
+            CommentsDataSource.Factory factory = new CommentsDataSource.Factory();
+            RxPagedListBuilder<Integer, Comment> rxPagedListBuilder = new RxPagedListBuilder<>();
             commentsAdapter = new CommentsAdapter(new CommentDiffUtilItemCallback(), 3);
+
+
+
+
+
             commentsRecyclerView.setAdapter(commentsAdapter);
 
             showMoreButton.setOnClickListener(v -> {
