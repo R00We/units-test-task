@@ -15,6 +15,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import units.r00we.test_task.Constants;
 import units.r00we.test_task.R;
 import units.r00we.test_task.network.ApiService;
@@ -39,9 +41,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
-        if (commentList.size() > position) {
+        if (commentList.size() > 0 ) {
             Comment comment = commentList.get(position);
-            holder.author.setText(comment.getCreatedAt());
+            holder.author.setText(comment.getUser().getLogin());
             holder.coment.setText(comment.getBody());
         } else {
             holder.author.setText("Loading");
@@ -81,6 +83,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     private void loadComments(@NonNull Issue issue) {
         apiService.getCommentList(Constants.User, Constants.Repo, issue.getNumber())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((comments, throwable) -> {
                     if (comments != null) {
                         commentList.addAll(comments);
@@ -108,14 +111,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     private void recalculateSizeAndNotify(){
         if (isCollapsed) {
-            int positionStart = getItemCount();
+            int positionStart = getItemCount() - 1;
             int itemsCount = commentsSize - positionStart;
             notifyItemRangeRemoved(positionStart, itemsCount);
         } else {
-            int positionStart = getItemCount();
+            int positionStart = getItemCount() - 1;
             int itemsCount = commentsSize;
             notifyItemRangeInserted(positionStart, itemsCount);
-
         }
     }
 
@@ -129,8 +131,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             author = itemView.findViewById(R.id.commentAuthor);
             coment = itemView.findViewById(R.id.commentText);
         }
-
-
 
     }
 }

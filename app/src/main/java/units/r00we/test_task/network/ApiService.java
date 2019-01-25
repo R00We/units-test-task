@@ -18,5 +18,5 @@ public interface ApiService {
     @GET("/repos/{user}/{repo}/issues/{issueNumber}/comments?access_token=6551a91d3e9c196a4c0d842734ba7e4268d3bf25")
     Single<List<Comment>> getCommentList(@Path("user") String user,
                                          @Path("repo") String repo,
-                                         @Query("issueNumber") int issueNumber);
+                                         @Path("issueNumber") int issueNumber);
 }
