@@ -38,7 +38,7 @@ public class ApplicationModule {
 
     @Singleton
     @Provides
-    DateFormatter getDateFormatter(Locale locale) {
-        return new DateFormatter(locale);
+    DateFormatter getDateFormatter() {
+        return new DateFormatter();
     }
 }

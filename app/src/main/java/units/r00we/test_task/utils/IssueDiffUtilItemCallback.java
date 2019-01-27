@@ -2,7 +2,7 @@ package units.r00we.test_task.utils;
 
 import android.support.v7.util.DiffUtil;
 
-import units.r00we.test_task.network.Issue;
+import units.r00we.test_task.data.entity.Issue;
 
 public class IssueDiffUtilItemCallback extends DiffUtil.ItemCallback<Issue>  {
     @Override

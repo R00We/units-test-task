@@ -1,4 +1,4 @@
-package units.r00we.test_task.network;
+package units.r00we.test_task.data.entity;
 
 public class User {
     private String login;

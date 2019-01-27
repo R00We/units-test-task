@@ -1,4 +1,4 @@
-package units.r00we.test_task.ui;
+package units.r00we.test_task.ui.view;
 
 import android.arch.paging.PagedListAdapter;
 import android.arch.paging.RxPagedListBuilder;
@@ -12,9 +12,10 @@ import javax.inject.Inject;
 import io.reactivex.disposables.CompositeDisposable;
 import units.r00we.test_task.App;
 import units.r00we.test_task.R;
-import units.r00we.test_task.network.Issue;
+import units.r00we.test_task.data.entity.Issue;
+import units.r00we.test_task.ui.presenter.GroupByDateAdapter;
+import units.r00we.test_task.ui.presenter.IssueAdapter;
 import units.r00we.test_task.utils.DateFormatter;
-import units.r00we.test_task.utils.FindFormat;
 
 public class IssueListActivity extends AppCompatActivity {
 
@@ -23,7 +24,7 @@ public class IssueListActivity extends AppCompatActivity {
     @Inject
     RxPagedListBuilder<Integer, Issue> rxPagedListBuilder;
     @Inject
-    PagedListAdapter<Issue, IssueAdapter.IssueViewHolder> issueAdapter;
+    PagedListAdapter<Issue, IssueView> issueAdapter;
     @Inject
     DateFormatter dateFormatter;
 

@@ -2,4 +2,7 @@
     <string name="app_name">MainActivity</string>
     <string name="show_more_text">Показать больше</string>
     <string name="show_less_text">Свернуть</string>
+
+    <string name="placeholder_comment_author">Loading</string>
+    <string name="placeholder_comment_text">…</string>
 </resources>

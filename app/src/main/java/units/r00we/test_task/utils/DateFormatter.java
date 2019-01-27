@@ -1,23 +1,9 @@
 package units.r00we.test_task.utils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 public class DateFormatter {
-    private final Locale current;
-    private final DateFormat timeFormatter;
-
-    public DateFormatter(Locale current) {
-        this.current = current;
-        timeFormatter = new SimpleDateFormat("HH:mm", current);
-    }
-
-    public String getHMFromeDate(Date date) {
-        return timeFormatter.format(date);
-    }
 
     public Date removeTime(Date date) {
         Calendar cal = Calendar.getInstance();
@@ -28,4 +14,5 @@ public class DateFormatter {
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
+
 }

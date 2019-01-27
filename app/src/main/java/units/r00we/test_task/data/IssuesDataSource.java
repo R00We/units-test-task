@@ -1,4 +1,4 @@
-package units.r00we.test_task.network;
+package units.r00we.test_task.data;
 
 import android.arch.paging.DataSource;
 import android.arch.paging.PageKeyedDataSource;
@@ -6,31 +6,27 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import io.reactivex.disposables.CompositeDisposable;
+import units.r00we.test_task.data.entity.Issue;
 
 public class IssuesDataSource extends PageKeyedDataSource<Integer,Issue> {
 
-    //todo реализовать обработку ошибок
+    private static final String TAG = "IssuesDataSource";
 
-    private final ApiService apiService;
+    private final ApiRepository apiRepository;
     private CompositeDisposable compositeDisposable;
-    private final String user;
-    private final String repo;
 
-
-    public IssuesDataSource(String user, String repo, ApiService apiService, CompositeDisposable compositeDisposable) {
-        this.apiService = apiService;
+    public IssuesDataSource(ApiRepository apiRepository, CompositeDisposable compositeDisposable) {
+        this.apiRepository = apiRepository;
         this.compositeDisposable = compositeDisposable;
-        this.user = user;
-        this.repo = repo;
     }
 
     @Override
     public void loadInitial(@NonNull LoadInitialParams params, @NonNull final LoadInitialCallback callback) {
-            compositeDisposable.add(apiService.getIssueList(user, repo, 1, "all").subscribe((issues, throwable) -> {
+            compositeDisposable.add(apiRepository.getIssueList(1, "all").subscribe((issues, throwable) -> {
             if (issues != null) {
                 callback.onResult(issues, null, 2 );
-            } else {
-                Log.d("loadInitial error", throwable.getMessage());
+            } else if (throwable != null) {
+                Log.d(TAG, "loadInitial exception - "+throwable.getMessage());
             }
         }));
     }
@@ -43,32 +39,29 @@ public class IssuesDataSource extends PageKeyedDataSource<Integer,Issue> {
     @Override
     public void loadAfter(@NonNull LoadParams params, @NonNull LoadCallback callback) {
         int page = (Integer) params.key;
-        compositeDisposable.add(apiService.getIssueList(user, repo, page, "all").subscribe((issues, throwable) -> {
+        compositeDisposable.add(apiRepository.getIssueList(page, "all").subscribe((issues, throwable) -> {
             if (issues != null) {
                 callback.onResult(issues, page+1);
-            } else {
-                Log.d("loadAfter error", throwable.getMessage());
+            } else if (throwable != null) {
+                Log.d(TAG, "loadAfter exception - "+throwable.getMessage());
             }
         }));
     }
 
     public static class Factory extends DataSource.Factory<Integer, Issue> {
 
-        private final ApiService apiService;
+        private final ApiRepository apiRepository;
         private final CompositeDisposable compositeDisposable;
-        private final String user;
-        private final String repo;
 
-        public Factory(String user, String repo, ApiService apiService, CompositeDisposable compositeDisposable) {
-            this.apiService = apiService;
+        public Factory(ApiRepository apiRepository, CompositeDisposable compositeDisposable) {
+            this.apiRepository = apiRepository;
             this.compositeDisposable = compositeDisposable;
-            this.user = user;
-            this.repo = repo;
+
         }
 
         @Override
         public DataSource<Integer, Issue> create() {
-            return new IssuesDataSource(user, repo, apiService, compositeDisposable);
+            return new IssuesDataSource(apiRepository, compositeDisposable);
         }
     }
 }
