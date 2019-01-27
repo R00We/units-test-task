@@ -1,5 +1,6 @@
 package units.r00we.test_task.di;
 
+import android.app.Application;
 import android.arch.paging.DataSource;
 import android.arch.paging.PagedList;
 import android.arch.paging.RxPagedListBuilder;
@@ -29,12 +30,11 @@ import units.r00we.test_task.data.TokenInterceptor;
 @Module
 public class NetworkModule {
 
-
     @Singleton
     @Provides
-    OkHttpClient getOkHttpClient(Context context) {
+    OkHttpClient getOkHttpClient(Application application) {
 
-        File httpCacheDirectory = new File(context.getCacheDir(), "responses");
+        File httpCacheDirectory = new File(application.getCacheDir(), "responses");
         int cacheSize = 10 * 1024 * 1024;
 
         return new OkHttpClient.Builder()
@@ -57,6 +57,7 @@ public class NetworkModule {
     }
 
     @Provides
+    @Singleton
     CompositeDisposable getCompositeDisposable() {
         return new CompositeDisposable();
     }
@@ -67,17 +68,6 @@ public class NetworkModule {
         return new ApiRepository(Constants.USER, Constants.REPOSITORY, apiService);
     }
 
-
-    //todo подумать, скорее всего этот конфиг в UIModule должен быть
-    @Provides
-    @Named("IssuePagedListConfig")
-    PagedList.Config getIssuePagedListConfig(){
-        return new PagedList.Config.Builder()
-                .setEnablePlaceholders(false)
-                .setPageSize(30)
-                .setPrefetchDistance(10)
-                .build();
-    }
 
     @Provides
     @Named("IssueDataSource")
@@ -90,6 +80,16 @@ public class NetworkModule {
     RxPagedListBuilder<Integer, Issue> getCommentRxPagedListBuilder(@Named("IssueDataSource") DataSource.Factory<Integer, Issue>  dataSourceFactory,
                                              @Named("IssuePagedListConfig") PagedList.Config pagedListConfig) {
         return new RxPagedListBuilder<>(dataSourceFactory, pagedListConfig);
+    }
+
+    @Provides
+    @Named("IssuePagedListConfig")
+    PagedList.Config getIssuePagedListConfig(){
+        return new PagedList.Config.Builder()
+                .setEnablePlaceholders(false)
+                .setPageSize(30)
+                .setPrefetchDistance(10)
+                .build();
     }
 
 }

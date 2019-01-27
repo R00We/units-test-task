@@ -4,53 +4,51 @@ import android.arch.paging.PagedListAdapter;
 import android.arch.paging.RxPagedListBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import javax.inject.Inject;
 
-import io.reactivex.disposables.CompositeDisposable;
 import units.r00we.test_task.App;
 import units.r00we.test_task.R;
-import units.r00we.test_task.data.entity.Issue;
-import units.r00we.test_task.ui.presenter.GroupByDateAdapter;
-import units.r00we.test_task.ui.presenter.IssueAdapter;
-import units.r00we.test_task.utils.DateFormatter;
+import units.r00we.test_task.ui.IssueListContract;
 
-public class IssueListActivity extends AppCompatActivity {
+public class IssueListActivity extends BaseActivity implements IssueListContract.View {
+
+    private RecyclerView recyclerView;
 
     @Inject
-    CompositeDisposable compositeDisposable;
+    IssueListContract.Presenter presenter;
+
     @Inject
-    RxPagedListBuilder<Integer, Issue> rxPagedListBuilder;
-    @Inject
-    PagedListAdapter<Issue, IssueView> issueAdapter;
-    @Inject
-    DateFormatter dateFormatter;
+    LinearLayoutManager layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ((App)getApplication()).getApplicationModule().inject(this);
+        getPresentationCompomemt().inject(this);
 
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(layoutManager);
 
-        //todo что с di тут?
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new GroupByDateAdapter(issueAdapter, dateFormatter));
+    }
 
+    @Override
+    public void setAdapter(RecyclerView.Adapter adapter) {
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        compositeDisposable.add(rxPagedListBuilder.buildObservable().subscribe(issueAdapter::submitList));
+        presenter.bind(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        compositeDisposable.dispose();
+        presenter.unbind();
     }
 }

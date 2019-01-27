@@ -10,7 +10,6 @@ import units.r00we.test_task.data.entity.Comment;
 import units.r00we.test_task.data.entity.Issue;
 
 public interface ApiService {
-    //todo provide access_token https://github.com/settings/tokens
     @GET("/repos/{user}/{repo}/issues")
     Single<List<Issue>> getIssueList(@Path("user") String user,
                                      @Path("repo") String repo,
