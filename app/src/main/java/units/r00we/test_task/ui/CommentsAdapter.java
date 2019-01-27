@@ -43,11 +43,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         if (commentList.size() > 0 ) {
             Comment comment = commentList.get(position);
-            holder.author.setText(comment.getUser().getLogin());
-            holder.coment.setText(comment.getBody());
+            holder.fill(comment);
         } else {
-            holder.author.setText("Loading");
-            holder.coment.setText("...");
+            holder.showPlaceHolder();
         }
     }
 
@@ -57,6 +55,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_view, parent, false);
         return new CommentViewHolder(view);
     }
+
+
 
     void setCommentsSize(int commentsSize) {
         this.commentsSize = commentsSize;
@@ -82,13 +82,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     }
 
     private void loadComments(@NonNull Issue issue) {
+
+        //todo disposable
         apiService.getCommentList(Constants.User, Constants.Repo, issue.getNumber())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((comments, throwable) -> {
                     if (comments != null) {
                         commentList.addAll(comments);
                         commentsSize = commentList.size();
-                        recalculateSizeAndNotify();
+                        notifyDataSetChanged();
                     } else {
                         Log.d("loadComments", throwable.getMessage());
                     }
@@ -108,6 +110,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         isCollapsed = true;
         recalculateSizeAndNotify();
     }
+
 
     private void recalculateSizeAndNotify(){
         if (isCollapsed) {
@@ -130,6 +133,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             super(itemView);
             author = itemView.findViewById(R.id.commentAuthor);
             coment = itemView.findViewById(R.id.commentText);
+        }
+
+        void fill(Comment comment) {
+            author.setText(comment.getUser().getLogin());
+            coment.setText(comment.getBody());
+        }
+
+        void showPlaceHolder() {
+            author.setText("Loading");
+            coment.setText("...");
         }
 
     }
