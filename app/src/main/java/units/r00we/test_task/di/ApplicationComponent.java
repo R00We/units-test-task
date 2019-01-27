@@ -3,13 +3,11 @@ package units.r00we.test_task.di;
 import javax.inject.Singleton;
 
 import dagger.Component;
-import units.r00we.test_task.network.ApiService;
-import units.r00we.test_task.ui.IssueAdapter;
-import units.r00we.test_task.ui.IssueListActivity;
+import units.r00we.test_task.data.ApiRepository;
 
 @Singleton
-@Component(modules = {ApplicationModule.class, UIModule.class, NetworkModule.class})
+@Component(modules = {ApplicationModule.class, NetworkModule.class})
 public interface ApplicationComponent {
-    void inject(IssueListActivity issueListActivity);
-    ApiService getApiService();
+    ApiRepository getApiRepository();
+    PresentationComponent newPresentationComponent(PresentationModule presentationModule);
 }

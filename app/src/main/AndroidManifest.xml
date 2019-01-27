@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:name=".App"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.IssueListActivity">
+        <activity android:name=".ui.view.IssueListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

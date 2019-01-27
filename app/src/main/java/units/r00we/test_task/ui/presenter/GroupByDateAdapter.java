@@ -1,4 +1,4 @@
-package units.r00we.test_task.ui;
+package units.r00we.test_task.ui.presenter;
 
 import android.arch.paging.PagedList;
 import android.arch.paging.PagedListAdapter;
@@ -20,7 +20,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import units.r00we.test_task.R;
-import units.r00we.test_task.network.Issue;
+import units.r00we.test_task.data.entity.Issue;
+import units.r00we.test_task.ui.view.IssueView;
 import units.r00we.test_task.utils.DateFormatter;
 
 import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
@@ -34,7 +35,7 @@ import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
 public class GroupByDateAdapter extends RecyclerView.Adapter {
 
     public static final int DATE_HOLDER_TYPE = -1;
-    private final PagedListAdapter<Issue, IssueAdapter.IssueViewHolder> wrappedAdapter;
+    private final PagedListAdapter<Issue, IssueView> wrappedAdapter;
     private final List<Object> allItems = new ArrayList<>();
     private final List<Object> wrappedItems = new ArrayList<>();
     private final DateFormatter dateUtils;
@@ -57,7 +58,7 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
     @Nullable
     private RecyclerView.AdapterDataObserver adapterDataObserver = null;
 
-    public GroupByDateAdapter(PagedListAdapter<Issue, IssueAdapter.IssueViewHolder> wrappedAdapter, DateFormatter dateUtils) {
+    public GroupByDateAdapter(PagedListAdapter<Issue, IssueView> wrappedAdapter, DateFormatter dateUtils) {
         this.wrappedAdapter = wrappedAdapter;
         this.dateUtils = dateUtils;
     }
@@ -82,7 +83,7 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
                 Date dateItem = (Date)item;
                 dateViewHolder.fill(dateItem);
             } else {
-                IssueAdapter.IssueViewHolder issueViewHolder = (IssueAdapter.IssueViewHolder)holder;
+                IssueView issueViewHolder = (IssueView)holder;
                 wrappedAdapter.onBindViewHolder(issueViewHolder, wrappedItems.indexOf(item));
             }
         }
@@ -122,7 +123,7 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
             wrappedItems.clear();
 
             for (Issue issue : currentPagedList) {
-                Date date = dateUtils.removeTime(issue.getUpdatedAt());
+                Date date = dateUtils.removeTime(issue.getCreatedAt());
                 Set<Issue> currentSet = dateItemsMap.get(date);
                 if (currentSet == null) {
                     currentSet = new LinkedHashSet<>();
