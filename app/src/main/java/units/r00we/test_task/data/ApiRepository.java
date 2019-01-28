@@ -37,6 +37,8 @@ public class ApiRepository implements IApiRepository {
         return apiService.getCommentList(user, repository, issueNumber);
     }
 
+
+    //todo сортировку в презентер и пусть тогда observable отдает.
     public Single<List<IssueWithComments>> getCompoundIssueList(int page, String state) {
         return getIssueList(page, state)
                 .flatMapObservable(Observable::fromIterable)
@@ -44,6 +46,6 @@ public class ApiRepository implements IApiRepository {
                         getCommentList(issue.getNumber())
                                 .flatMapObservable(comments ->
                                         Observable.just(new IssueWithComments(issue, comments))))
-                .toList();
+                .toSortedList((o1, o2) -> o2.getIssue().getCreatedAt().compareTo(o1.getIssue().getCreatedAt()));
     }
 }

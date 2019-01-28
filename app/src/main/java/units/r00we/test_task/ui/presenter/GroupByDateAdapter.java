@@ -40,24 +40,25 @@ public class GroupByDateAdapter extends CustomListAdapter {
     public static final int DATE_HOLDER_TYPE = -1;
     private final CustomListAdapter<IssueWithComments, IssueView> wrappedAdapter;
     private final List<Object> allItems = new ArrayList<>();
-    private final List<IssueWithComments> wrappedItems = new ArrayList<>();
     private final DateFormatter dateUtils;
 
-    private final RecyclerView.AdapterDataObserver wrappedAdapterObserver = new RecyclerView.AdapterDataObserver() {
+    private final Map<Date, Set<IssueWithComments>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
 
-        @Override
-        public void onItemRangeInserted(int wrappedPositionStart, int wrappedItemCount) {
-            super.onItemRangeInserted(wrappedPositionStart, wrappedItemCount);
-
-                int positionStart = allItems.size();
-                prepareData();
-                int itemCount = allItems.size() - positionStart;
-                if (adapterDataObserver != null) {
-                    adapterDataObserver.onItemRangeInserted(positionStart, itemCount);
-                }
-        }
-
-    };
+//    private final RecyclerView.AdapterDataObserver wrappedAdapterObserver = new RecyclerView.AdapterDataObserver() {
+//
+//        @Override
+//        public void onItemRangeInserted(int wrappedPositionStart, int wrappedItemCount) {
+//            super.onItemRangeInserted(wrappedPositionStart, wrappedItemCount);
+//
+//                int positionStart = allItems.size();
+//                prepareData();
+//                int itemCount = allItems.size() - positionStart;
+//                if (adapterDataObserver != null) {
+//                    adapterDataObserver.onItemRangeInserted(positionStart, itemCount);
+//                }
+//        }
+//
+//    };
 
     @Nullable
     private RecyclerView.AdapterDataObserver adapterDataObserver = null;
@@ -88,14 +89,9 @@ public class GroupByDateAdapter extends CustomListAdapter {
                 dateViewHolder.fill(dateItem);
             } else {
                 IssueView issueViewHolder = (IssueView)holder;
-                wrappedAdapter.onBindViewHolder(issueViewHolder, wrappedItems.indexOf(item));
+                issueViewHolder.fill((IssueWithComments)item);
             }
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return allItems.size();
     }
 
     @Override
@@ -118,15 +114,39 @@ public class GroupByDateAdapter extends CustomListAdapter {
         return wrappedAdapter.getItemId(position);
     }
 
-    private void prepareData(){
-        if (wrappedAdapter.getItemCount() > 0) {
+//    private void prepareData(){
+//        if (wrappedAdapter.getItemCount() > 0) {
+//
+//            Map<Date, Set<IssueWithComments>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
+//            allItems.clear();
+//            wrappedItems.clear();
+//
+//            for (int position = 0; position < wrappedAdapter.getItemCount(); position++) {
+//                IssueWithComments issueWithComments = wrappedAdapter.getItem(position);
+//                Date date = dateUtils.removeTime(issueWithComments.getIssue().getCreatedAt());
+//                Set<IssueWithComments> currentSet = dateItemsMap.get(date);
+//                if (currentSet == null) {
+//                    currentSet = new LinkedHashSet<>();
+//                    dateItemsMap.put(date, currentSet);
+//                }
+//                currentSet.add(issueWithComments);
+//                wrappedItems.add(issueWithComments);
+//            }
+//
+//            for (Date date : dateItemsMap.keySet()) {
+//                allItems.add(date);
+//                allItems.addAll(dateItemsMap.get(date));
+//            }
+//        }
+//    }
 
-            Map<Date, Set<IssueWithComments>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
+    private List getCompositeListForSubmit(List newList){
+        List result = new ArrayList();
+        if (newList.size() > 0) {
             allItems.clear();
-            wrappedItems.clear();
 
-            for (int position = 0; position < wrappedAdapter.getItemCount(); position++) {
-                IssueWithComments issueWithComments = wrappedAdapter.getItem(position);
+            for (int position = 0; position < newList.size(); position++) {
+                IssueWithComments issueWithComments = (IssueWithComments)newList.get(position);
                 Date date = dateUtils.removeTime(issueWithComments.getIssue().getCreatedAt());
                 Set<IssueWithComments> currentSet = dateItemsMap.get(date);
                 if (currentSet == null) {
@@ -134,37 +154,45 @@ public class GroupByDateAdapter extends CustomListAdapter {
                     dateItemsMap.put(date, currentSet);
                 }
                 currentSet.add(issueWithComments);
-                wrappedItems.add(issueWithComments);
             }
 
             for (Date date : dateItemsMap.keySet()) {
                 allItems.add(date);
                 allItems.addAll(dateItemsMap.get(date));
             }
+
+            int firstNewIndex = 0;
+            if (getItemCount() > 0) {
+                firstNewIndex = getItemCount();
+            }
+            result = allItems.subList(firstNewIndex, allItems.size());
         }
+        return result;
     }
 
 
-    @Override
-    public void registerAdapterDataObserver(@NonNull RecyclerView.AdapterDataObserver observer) {
-        super.registerAdapterDataObserver(observer);
-        adapterDataObserver = observer;
-        wrappedAdapter.registerAdapterDataObserver(wrappedAdapterObserver);
-    }
 
-    @Override
-    public void unregisterAdapterDataObserver(@NonNull RecyclerView.AdapterDataObserver observer) {
-        super.unregisterAdapterDataObserver(observer);
-        wrappedAdapter.unregisterAdapterDataObserver(wrappedAdapterObserver);
-        adapterDataObserver = null;
-    }
 
     @Override
     public void submitList(List list) {
         wrappedAdapter.submitList(list);
-        prepareData();
-        super.submitList(allItems);
+        super.submitList(getCompositeListForSubmit(list));
     }
+
+
+//    @Override
+//    public void registerAdapterDataObserver(@NonNull RecyclerView.AdapterDataObserver observer) {
+//        super.registerAdapterDataObserver(observer);
+//        adapterDataObserver = observer;
+//        wrappedAdapter.registerAdapterDataObserver(wrappedAdapterObserver);
+//    }
+//
+//    @Override
+//    public void unregisterAdapterDataObserver(@NonNull RecyclerView.AdapterDataObserver observer) {
+//        super.unregisterAdapterDataObserver(observer);
+//        wrappedAdapter.unregisterAdapterDataObserver(wrappedAdapterObserver);
+//        adapterDataObserver = null;
+//    }
 
     @Override
     public void clear() {
