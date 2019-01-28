@@ -32,7 +32,7 @@ import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
  * Сейчас адаптер расчитан только но последоватеьное добавление новых элементов в конец списка.
  * Манипуляции с добавление не в конец списка и другие могут привести к неправильному показу элементов.
  */
-public class GroupByDateAdapter extends RecyclerView.Adapter implements WithCollectionAdapter<IssueWithComments> {
+public class GroupByDateAdapter extends RecyclerView.Adapter {
 
     public static final int DATE_HOLDER_TYPE = -1;
     private final IssueAdapter wrappedAdapter;
@@ -116,51 +116,31 @@ public class GroupByDateAdapter extends RecyclerView.Adapter implements WithColl
     }
 
     private void prepareData(){
-        if (wrappedAdapter.getItemCount() > 0) {
-
-            Map<Date, Set<Issue>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
-            allItems.clear();
-            wrappedItems.clear();
-
-            for (int position = 0; position < wrappedAdapter.getItemCount(); position++) {
-                Issue issue = wrappedAdapter.getItem(position).getIssue();
-                Date date = dateUtils.removeTime(issue.getCreatedAt());
-                Set<Issue> currentSet = dateItemsMap.get(date);
-                if (currentSet == null) {
-                    currentSet = new LinkedHashSet<>();
-                    dateItemsMap.put(date, currentSet);
-                }
-                currentSet.add(issue);
-                wrappedItems.add(issue);
-            }
-
-            for (Date date : dateItemsMap.keySet()) {
-                allItems.add(date);
-                allItems.addAll(dateItemsMap.get(date));
-            }
-        }
+//        if (wrappedAdapter.getItemCount() > 0) {
+//
+//            Map<Date, Set<Issue>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
+//            allItems.clear();
+//            wrappedItems.clear();
+//
+//            for (int position = 0; position < wrappedAdapter.getItemCount(); position++) {
+//                Issue issue = wrappedAdapter.getItem(position).getIssue();
+//                Date date = dateUtils.removeTime(issue.getCreatedAt());
+//                Set<Issue> currentSet = dateItemsMap.get(date);
+//                if (currentSet == null) {
+//                    currentSet = new LinkedHashSet<>();
+//                    dateItemsMap.put(date, currentSet);
+//                }
+//                currentSet.add(issue);
+//                wrappedItems.add(issue);
+//            }
+//
+//            for (Date date : dateItemsMap.keySet()) {
+//                allItems.add(date);
+//                allItems.addAll(dateItemsMap.get(date));
+//            }
+//        }
     }
 
-    @Override
-    public void add(IssueWithComments item) {
-        wrappedAdapter.add(item);
-    }
-
-    @Override
-    public void addAll(Collection<? extends IssueWithComments> items) {
-        wrappedAdapter.addAll(items);
-
-    }
-
-    @Override
-    public IssueWithComments getItem(int positions) {
-        return wrappedAdapter.getItem(positions);
-    }
-
-    @Override
-    public void clear() {
-        wrappedAdapter.clear();
-    }
 
     @Override
     public void registerAdapterDataObserver(@NonNull RecyclerView.AdapterDataObserver observer) {

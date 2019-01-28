@@ -47,6 +47,7 @@ public class IssueListActivity extends BaseActivity implements IssueListContract
 
         swipeRefreshLayout.setOnRefreshListener(() -> presenter.onRefresh());
 
+
     }
 
     @Override

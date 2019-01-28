@@ -1,6 +1,8 @@
 package units.r00we.test_task.ui.presenter;
 
 import android.support.annotation.NonNull;
+import android.support.v7.recyclerview.extensions.ListAdapter;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,31 +16,10 @@ import units.r00we.test_task.R;
 import units.r00we.test_task.data.entity.IssueWithComments;
 import units.r00we.test_task.ui.view.IssueView;
 
-public class IssueAdapter extends RecyclerView.Adapter<IssueView> implements WithCollectionAdapter<IssueWithComments> {
+public class IssueAdapter extends ListAdapter<IssueWithComments, IssueView> {
 
-    private final List<IssueWithComments> itemsList = new ArrayList<>();
-
-    public IssueAdapter() {
-    }
-
-    @Override
-    public void add(IssueWithComments item) {
-        itemsList.add(item);
-    }
-
-    @Override
-    public void addAll(Collection<? extends IssueWithComments> items) {
-        itemsList.addAll(items);
-    }
-
-    @Override
-    public IssueWithComments getItem(int positions) {
-        return itemsList.get(positions);
-    }
-
-    @Override
-    public void clear() {
-        itemsList.clear();
+    public IssueAdapter(@NonNull DiffUtil.ItemCallback<IssueWithComments> diffCallback) {
+        super(diffCallback);
     }
 
     @NonNull
@@ -48,15 +29,9 @@ public class IssueAdapter extends RecyclerView.Adapter<IssueView> implements Wit
         return new IssueView(view);
     }
 
-
-    @Override
-    public int getItemCount() {
-        return itemsList.size();
-    }
-
     @Override
     public void onBindViewHolder(@NonNull IssueView holder, int position) {
-        IssueWithComments issue = itemsList.get(position);
+        IssueWithComments issue = getItem(position);
         if (issue != null) {
             holder.fill(issue);
         }

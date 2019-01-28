@@ -31,12 +31,13 @@ public class ApiRepository implements IApiRepository {
         return apiService.getCommentList(user, repository, issueNumber);
     }
 
-    public Observable<IssueWithComments> getCompoundIssueList(int page, String state) {
+    public Single<List<IssueWithComments>> getCompoundIssueList(int page, String state) {
         return getIssueList(page, state)
                 .flatMapObservable(Observable::fromIterable)
                 .flatMap(issue ->
                         getCommentList(issue.getNumber())
                                 .flatMapObservable(comments ->
-                                        Observable.just(new IssueWithComments(issue, comments))));
+                                        Observable.just(new IssueWithComments(issue, comments))))
+                .toList();
     }
 }
