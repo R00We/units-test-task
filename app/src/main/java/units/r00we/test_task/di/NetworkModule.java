@@ -1,9 +1,6 @@
 package units.r00we.test_task.di;
 
 import android.app.Application;
-import android.arch.paging.DataSource;
-import android.arch.paging.PagedList;
-import android.arch.paging.RxPagedListBuilder;
 import android.content.Context;
 
 import java.io.File;
@@ -24,7 +21,6 @@ import units.r00we.test_task.Constants;
 import units.r00we.test_task.data.ApiRepository;
 import units.r00we.test_task.data.ApiService;
 import units.r00we.test_task.data.entity.Issue;
-import units.r00we.test_task.data.IssuesDataSource;
 import units.r00we.test_task.data.TokenInterceptor;
 
 @Module

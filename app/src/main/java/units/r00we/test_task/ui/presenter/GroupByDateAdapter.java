@@ -1,7 +1,5 @@
 package units.r00we.test_task.ui.presenter;
 
-import android.arch.paging.PagedList;
-import android.arch.paging.PagedListAdapter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -21,6 +20,7 @@ import java.util.TreeMap;
 
 import units.r00we.test_task.R;
 import units.r00we.test_task.data.entity.Issue;
+import units.r00we.test_task.data.entity.IssueWithComments;
 import units.r00we.test_task.ui.view.IssueView;
 import units.r00we.test_task.utils.DateFormatter;
 
@@ -32,10 +32,10 @@ import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
  * Сейчас адаптер расчитан только но последоватеьное добавление новых элементов в конец списка.
  * Манипуляции с добавление не в конец списка и другие могут привести к неправильному показу элементов.
  */
-public class GroupByDateAdapter extends RecyclerView.Adapter {
+public class GroupByDateAdapter extends RecyclerView.Adapter implements WithCollectionAdapter<IssueWithComments> {
 
     public static final int DATE_HOLDER_TYPE = -1;
-    private final PagedListAdapter<Issue, IssueView> wrappedAdapter;
+    private final IssueAdapter wrappedAdapter;
     private final List<Object> allItems = new ArrayList<>();
     private final List<Object> wrappedItems = new ArrayList<>();
     private final DateFormatter dateUtils;
@@ -55,10 +55,11 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
         }
 
     };
+
     @Nullable
     private RecyclerView.AdapterDataObserver adapterDataObserver = null;
 
-    public GroupByDateAdapter(PagedListAdapter<Issue, IssueView> wrappedAdapter, DateFormatter dateUtils) {
+    public GroupByDateAdapter(IssueAdapter wrappedAdapter, DateFormatter dateUtils) {
         this.wrappedAdapter = wrappedAdapter;
         this.dateUtils = dateUtils;
     }
@@ -115,14 +116,14 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
     }
 
     private void prepareData(){
-        PagedList<Issue> currentPagedList = wrappedAdapter.getCurrentList();
-        if (currentPagedList != null && currentPagedList.size() > 0) {
+        if (wrappedAdapter.getItemCount() > 0) {
 
             Map<Date, Set<Issue>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
             allItems.clear();
             wrappedItems.clear();
 
-            for (Issue issue : currentPagedList) {
+            for (int position = 0; position < wrappedAdapter.getItemCount(); position++) {
+                Issue issue = wrappedAdapter.getItem(position).getIssue();
                 Date date = dateUtils.removeTime(issue.getCreatedAt());
                 Set<Issue> currentSet = dateItemsMap.get(date);
                 if (currentSet == null) {
@@ -138,6 +139,27 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
                 allItems.addAll(dateItemsMap.get(date));
             }
         }
+    }
+
+    @Override
+    public void add(IssueWithComments item) {
+        wrappedAdapter.add(item);
+    }
+
+    @Override
+    public void addAll(Collection<? extends IssueWithComments> items) {
+        wrappedAdapter.addAll(items);
+
+    }
+
+    @Override
+    public IssueWithComments getItem(int positions) {
+        return wrappedAdapter.getItem(positions);
+    }
+
+    @Override
+    public void clear() {
+        wrappedAdapter.clear();
     }
 
     @Override
@@ -169,9 +191,6 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
                     DateUtils.DAY_IN_MILLIS, FORMAT_SHOW_DATE));
 
         }
-
-
-
     }
 
 }

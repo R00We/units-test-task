@@ -1,4 +1,4 @@
-package units.r00we.test_task.ui.presenter;
+package units.r00we.test_task.data.entity;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -27,15 +27,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentView> {
     private int sizeIfCollapsed;
     private boolean isCollapsed = false;
     private int commentsSize = 0;
-    private final ApiRepository apiRepository;
     private Disposable disposable;
 
     private List<Comment> commentList = new ArrayList<>();
 
-    public CommentsAdapter(int needCollapsedSize, int sizeIfCollapsed, ApiRepository apiRepository) {
+    public CommentsAdapter(int needCollapsedSize, int sizeIfCollapsed) {
         this.needCollapsedSize = needCollapsedSize;
         this.sizeIfCollapsed = sizeIfCollapsed;
-        this.apiRepository = apiRepository;
     }
 
     @Override
@@ -72,26 +70,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentView> {
         }
     }
 
-    public void setIssue(@NonNull Issue issue) {
-        if (disposable!= null && !disposable.isDisposed()) {
-            disposable.dispose();
-        }
-        commentList.clear();
-        loadComments(issue);
-    }
-
-    private void loadComments(@NonNull Issue issue) {
-        disposable = apiRepository.getCommentList(issue.getNumber())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((comments, throwable) -> {
-                    if (comments != null) {
-                        commentList.addAll(comments);
-                        commentsSize = commentList.size();
-                        notifyDataSetChanged();
-                    } else if (throwable != null){
-                        Log.d(TAG, "loadComments exception - "+throwable.getMessage());
-                    }
-                });
+    public void setComments(@NonNull List<Comment> commentsList) {
+        this.commentList = commentsList;
+        recalculateSizeAndNotify();
     }
 
     public boolean isCollapsed() {

@@ -1,31 +1,44 @@
 package units.r00we.test_task.ui.presenter;
 
-import android.arch.paging.PagedList;
-import android.arch.paging.PagedListAdapter;
 import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
-import units.r00we.test_task.App;
-import units.r00we.test_task.Constants;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import units.r00we.test_task.R;
-import units.r00we.test_task.data.ApiRepository;
-import units.r00we.test_task.data.entity.Issue;
+import units.r00we.test_task.data.entity.IssueWithComments;
 import units.r00we.test_task.ui.view.IssueView;
 
-import static android.text.format.DateUtils.FORMAT_SHOW_TIME;
+public class IssueAdapter extends RecyclerView.Adapter<IssueView> implements WithCollectionAdapter<IssueWithComments> {
 
-public class IssueAdapter extends PagedListAdapter<Issue, IssueView> {
+    private final List<IssueWithComments> itemsList = new ArrayList<>();
 
-    public IssueAdapter(@NonNull DiffUtil.ItemCallback<Issue> diffCallback) {
-        super(diffCallback);
+    public IssueAdapter() {
+    }
+
+    @Override
+    public void add(IssueWithComments item) {
+        itemsList.add(item);
+    }
+
+    @Override
+    public void addAll(Collection<? extends IssueWithComments> items) {
+        itemsList.addAll(items);
+    }
+
+    @Override
+    public IssueWithComments getItem(int positions) {
+        return itemsList.get(positions);
+    }
+
+    @Override
+    public void clear() {
+        itemsList.clear();
     }
 
     @NonNull
@@ -35,27 +48,18 @@ public class IssueAdapter extends PagedListAdapter<Issue, IssueView> {
         return new IssueView(view);
     }
 
+
     @Override
     public int getItemCount() {
-        return super.getItemCount();
+        return itemsList.size();
     }
 
     @Override
     public void onBindViewHolder(@NonNull IssueView holder, int position) {
-        Issue issue = getItem(position);
+        IssueWithComments issue = itemsList.get(position);
         if (issue != null) {
             holder.fill(issue);
         }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
-    }
-
-    @Override
-    public void submitList(PagedList<Issue> pagedList) {
-        super.submitList(pagedList);
     }
 
 

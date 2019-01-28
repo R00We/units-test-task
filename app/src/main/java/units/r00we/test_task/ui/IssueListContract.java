@@ -13,5 +13,6 @@ public interface IssueListContract {
         void bind(View view);
         void unbind();
         void onRefresh();
+        void onLoadPage(int page);
     }
 }

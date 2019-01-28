@@ -11,12 +11,11 @@ import android.widget.TextView;
 
 import javax.inject.Inject;
 
-import units.r00we.test_task.App;
 import units.r00we.test_task.Constants;
 import units.r00we.test_task.R;
 import units.r00we.test_task.data.ApiRepository;
-import units.r00we.test_task.data.entity.Issue;
-import units.r00we.test_task.ui.presenter.CommentsAdapter;
+import units.r00we.test_task.data.entity.CommentsAdapter;
+import units.r00we.test_task.data.entity.IssueWithComments;
 
 import static android.text.format.DateUtils.FORMAT_SHOW_TIME;
 
@@ -65,14 +64,14 @@ public class IssueView extends RecyclerView.ViewHolder {
         });
     }
 
-    public void fill(Issue issue) {
-        title.setText(issue.getTitle());
-        time.setText(DateUtils.formatDateTime(time.getContext(), issue.getUpdatedAt().getTime(), FORMAT_SHOW_TIME));
-        commentsAdapter.setCommentsSize(issue.getComments());
+    public void fill(IssueWithComments issueWithComments) {
+        title.setText(issueWithComments.getIssue().getTitle());
+        time.setText(DateUtils.formatDateTime(time.getContext(), issueWithComments.getIssue().getUpdatedAt().getTime(), FORMAT_SHOW_TIME));
+        commentsAdapter.setCommentsSize(issueWithComments.getIssue().getComments());
         commentsAdapter.collapseComments();
-        commentsAdapter.setIssue(issue);
+        commentsAdapter.setComments(issueWithComments.getComment());
 
-        if (issue.getComments() < Constants.NEED_COLLAPSED_SIZE) {
+        if (issueWithComments.getComment().size() < Constants.NEED_COLLAPSED_SIZE) {
             showMoreButton.setVisibility(View.GONE);
         } else {
             showMoreButton.setVisibility(View.VISIBLE);

@@ -1,24 +1,21 @@
 package units.r00we.test_task.ui.view;
 
-import android.arch.paging.PagedListAdapter;
-import android.arch.paging.RxPagedListBuilder;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import javax.inject.Inject;
 
-import units.r00we.test_task.App;
 import units.r00we.test_task.R;
 import units.r00we.test_task.ui.IssueListContract;
+import units.r00we.test_task.utils.EndlessRecyclerViewScrollListener;
 
 public class IssueListActivity extends BaseActivity implements IssueListContract.View {
 
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     @Inject
     IssueListContract.Presenter presenter;
@@ -36,6 +33,17 @@ public class IssueListActivity extends BaseActivity implements IssueListContract
         recyclerView.setLayoutManager(layoutManager);
 
         swipeRefreshLayout = findViewById(R.id.swipeToRefresh);
+
+        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                presenter.onLoadPage(page);
+            }
+        };
+
+        recyclerView.addOnScrollListener(scrollListener);
 
         swipeRefreshLayout.setOnRefreshListener(() -> presenter.onRefresh());
 

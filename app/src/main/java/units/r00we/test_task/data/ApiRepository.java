@@ -2,9 +2,11 @@ package units.r00we.test_task.data;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import units.r00we.test_task.data.entity.Comment;
 import units.r00we.test_task.data.entity.Issue;
+import units.r00we.test_task.data.entity.IssueWithComments;
 
 public class ApiRepository implements IApiRepository {
 
@@ -27,5 +29,14 @@ public class ApiRepository implements IApiRepository {
     @Override
     public Single<List<Comment>> getCommentList(int issueNumber) {
         return apiService.getCommentList(user, repository, issueNumber);
+    }
+
+    public Observable<IssueWithComments> getCompoundIssueList(int page, String state) {
+        return getIssueList(page, state)
+                .flatMapObservable(Observable::fromIterable)
+                .flatMap(issue ->
+                        getCommentList(issue.getNumber())
+                                .flatMapObservable(comments ->
+                                        Observable.just(new IssueWithComments(issue, comments))));
     }
 }
