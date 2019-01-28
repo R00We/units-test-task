@@ -21,7 +21,7 @@ import units.r00we.test_task.ui.view.CommentView;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentView> {
 
-    public static final String TAG = "CommentsAdapter";
+    private static final String TAG = "CommentsAdapter";
 
     private int needCollapsedSize;
     private int sizeIfCollapsed;

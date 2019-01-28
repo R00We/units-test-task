@@ -4,7 +4,7 @@ import dagger.Subcomponent;
 import units.r00we.test_task.ui.view.IssueListActivity;
 import units.r00we.test_task.ui.view.IssueView;
 
-@Subcomponent(modules = PresentationModule.class)
+@Subcomponent(modules = {PresentationModule.class, PagingModule.class})
 public interface PresentationComponent {
     void inject(IssueListActivity issueListActivity);
     void inject(IssueView issueView);

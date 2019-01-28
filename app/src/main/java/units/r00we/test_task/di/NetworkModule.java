@@ -30,7 +30,6 @@ import units.r00we.test_task.data.TokenInterceptor;
 @Module
 public class NetworkModule {
 
-    @Singleton
     @Provides
     OkHttpClient getOkHttpClient(Application application) {
 
@@ -43,7 +42,6 @@ public class NetworkModule {
                 .build();
     }
 
-    @Singleton
     @Provides
     ApiService getGitHubService(OkHttpClient client) {
 
@@ -57,39 +55,8 @@ public class NetworkModule {
     }
 
     @Provides
-    @Singleton
-    CompositeDisposable getCompositeDisposable() {
-        return new CompositeDisposable();
-    }
-
-    @Singleton
-    @Provides
     ApiRepository getApiRepository(ApiService apiService){
         return new ApiRepository(Constants.USER, Constants.REPOSITORY, apiService);
-    }
-
-
-    @Provides
-    @Named("IssueDataSource")
-    DataSource.Factory<Integer, Issue> getIssueDIssueDataSourceFactory(ApiRepository apiRepository, CompositeDisposable compositeDisposable) {
-        return new IssuesDataSource.Factory(apiRepository, compositeDisposable);
-    }
-
-
-    @Provides
-    RxPagedListBuilder<Integer, Issue> getCommentRxPagedListBuilder(@Named("IssueDataSource") DataSource.Factory<Integer, Issue>  dataSourceFactory,
-                                             @Named("IssuePagedListConfig") PagedList.Config pagedListConfig) {
-        return new RxPagedListBuilder<>(dataSourceFactory, pagedListConfig);
-    }
-
-    @Provides
-    @Named("IssuePagedListConfig")
-    PagedList.Config getIssuePagedListConfig(){
-        return new PagedList.Config.Builder()
-                .setEnablePlaceholders(false)
-                .setPageSize(30)
-                .setPrefetchDistance(10)
-                .build();
     }
 
 }

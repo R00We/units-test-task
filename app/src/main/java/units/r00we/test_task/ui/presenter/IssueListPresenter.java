@@ -2,6 +2,7 @@ package units.r00we.test_task.ui.presenter;
 
 import android.arch.paging.PagedListAdapter;
 import android.arch.paging.RxPagedListBuilder;
+import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
@@ -18,6 +19,10 @@ public class IssueListPresenter implements IssueListContract.Presenter {
     private final RxPagedListBuilder<Integer, Issue> rxPagedListBuilder;
     private final PagedListAdapter<Issue, IssueView> issueAdapter;
     private final DateFormatter dateFormatter;
+    private boolean adapterIsSet = false;
+
+    @Nullable
+    private IssueListContract.View view = null;
 
     public IssueListPresenter(CompositeDisposable compositeDisposable,
                               RxPagedListBuilder<Integer, Issue> rxPagedListBuilder,
@@ -31,12 +36,30 @@ public class IssueListPresenter implements IssueListContract.Presenter {
 
     @Override
     public void bind(IssueListContract.View view) {
-        view.setAdapter(new GroupByDateAdapter(issueAdapter, dateFormatter));
-        compositeDisposable.add(rxPagedListBuilder.buildObservable().subscribe(issueAdapter::submitList));
+        this.view = view;
+        if (!adapterIsSet) {
+            adapterIsSet = true;
+            view.setAdapter(new GroupByDateAdapter(issueAdapter, dateFormatter));
+            onRefresh();
+        }
     }
 
     @Override
     public void unbind() {
         compositeDisposable.dispose();
+        view = null;
+    }
+
+    @Override
+    public void onRefresh() {
+        if (view != null) {
+            view.showLoadingState();
+            compositeDisposable.add(rxPagedListBuilder.buildObservable().subscribe(issues -> {
+                issueAdapter.submitList(issues);
+                if (view != null) {
+                    view.hideLoadingState();
+                }
+            }));
+        }
     }
 }
