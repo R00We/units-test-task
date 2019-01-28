@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -26,8 +27,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentView> {
     private int needCollapsedSize;
     private int sizeIfCollapsed;
     private boolean isCollapsed = false;
-    private int commentsSize = 0;
-    private Disposable disposable;
 
     private List<Comment> commentList = new ArrayList<>();
 
@@ -38,12 +37,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentView> {
 
     @Override
     public void onBindViewHolder(@NonNull CommentView holder, int position) {
-        if (commentList.size() > 0) {
-            Comment comment = commentList.get(position);
-            holder.fill(comment);
-        } else {
-            holder.showPlaceHolder();
-        }
+        Comment comment = commentList.get(position);
+        holder.fill(comment);
+        Log.d(TAG, "onBindViewHolder position - "+ position);
     }
 
     @NonNull
@@ -53,26 +49,23 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentView> {
         return new CommentView(view);
     }
 
-    public void setCommentsSize(int commentsSize) {
-        this.commentsSize = commentsSize;
-    }
-
     @Override
     public int getItemCount() {
+        Log.d(TAG, "getItemCount");
         if (isCollapsed) {
-            if (commentsSize > needCollapsedSize) {
+            if (commentList.size() > needCollapsedSize) {
                 return sizeIfCollapsed;
             } else {
-                return commentsSize;
+                return commentList.size();
             }
         } else {
-            return commentsSize;
+            return commentList.size();
         }
     }
 
     public void setComments(@NonNull List<Comment> commentsList) {
         this.commentList = commentsList;
-        recalculateSizeAndNotify();
+        notifyDataSetChanged();
     }
 
     public boolean isCollapsed() {
@@ -91,12 +84,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentView> {
 
     private void recalculateSizeAndNotify(){
         if (isCollapsed) {
-            int positionStart = getItemCount() - 1;
-            int itemsCount = commentsSize - positionStart;
+            int positionStart = getItemCount();
+            int itemsCount = commentList.size() - positionStart;
             notifyItemRangeRemoved(positionStart, itemsCount);
         } else {
-            int positionStart = getItemCount() - 1;
-            int itemsCount = commentsSize;
+            int positionStart = sizeIfCollapsed;
+            int itemsCount = commentList.size() - positionStart;
             notifyItemRangeInserted(positionStart, itemsCount);
         }
     }

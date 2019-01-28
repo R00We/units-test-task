@@ -67,7 +67,6 @@ public class IssueView extends RecyclerView.ViewHolder {
     public void fill(IssueWithComments issueWithComments) {
         title.setText(issueWithComments.getIssue().getTitle());
         time.setText(DateUtils.formatDateTime(time.getContext(), issueWithComments.getIssue().getUpdatedAt().getTime(), FORMAT_SHOW_TIME));
-        commentsAdapter.setCommentsSize(issueWithComments.getIssue().getComments());
         commentsAdapter.collapseComments();
         commentsAdapter.setComments(issueWithComments.getComment());
 
