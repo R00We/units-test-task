@@ -2,6 +2,8 @@ package units.r00we.test_task.ui.presenter;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.recyclerview.extensions.ListAdapter;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -22,6 +24,7 @@ import units.r00we.test_task.R;
 import units.r00we.test_task.data.entity.Issue;
 import units.r00we.test_task.data.entity.IssueWithComments;
 import units.r00we.test_task.ui.view.IssueView;
+import units.r00we.test_task.utils.CustomListAdapter;
 import units.r00we.test_task.utils.DateFormatter;
 
 import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
@@ -32,12 +35,12 @@ import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
  * Сейчас адаптер расчитан только но последоватеьное добавление новых элементов в конец списка.
  * Манипуляции с добавление не в конец списка и другие могут привести к неправильному показу элементов.
  */
-public class GroupByDateAdapter extends RecyclerView.Adapter {
+public class GroupByDateAdapter extends CustomListAdapter {
 
     public static final int DATE_HOLDER_TYPE = -1;
-    private final IssueAdapter wrappedAdapter;
+    private final CustomListAdapter<IssueWithComments, IssueView> wrappedAdapter;
     private final List<Object> allItems = new ArrayList<>();
-    private final List<Object> wrappedItems = new ArrayList<>();
+    private final List<IssueWithComments> wrappedItems = new ArrayList<>();
     private final DateFormatter dateUtils;
 
     private final RecyclerView.AdapterDataObserver wrappedAdapterObserver = new RecyclerView.AdapterDataObserver() {
@@ -59,7 +62,7 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
     @Nullable
     private RecyclerView.AdapterDataObserver adapterDataObserver = null;
 
-    public GroupByDateAdapter(IssueAdapter wrappedAdapter, DateFormatter dateUtils) {
+    public GroupByDateAdapter( CustomListAdapter<IssueWithComments, IssueView> wrappedAdapter, DateFormatter dateUtils) {
         this.wrappedAdapter = wrappedAdapter;
         this.dateUtils = dateUtils;
     }
@@ -116,29 +119,29 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
     }
 
     private void prepareData(){
-//        if (wrappedAdapter.getItemCount() > 0) {
-//
-//            Map<Date, Set<Issue>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
-//            allItems.clear();
-//            wrappedItems.clear();
-//
-//            for (int position = 0; position < wrappedAdapter.getItemCount(); position++) {
-//                Issue issue = wrappedAdapter.getItem(position).getIssue();
-//                Date date = dateUtils.removeTime(issue.getCreatedAt());
-//                Set<Issue> currentSet = dateItemsMap.get(date);
-//                if (currentSet == null) {
-//                    currentSet = new LinkedHashSet<>();
-//                    dateItemsMap.put(date, currentSet);
-//                }
-//                currentSet.add(issue);
-//                wrappedItems.add(issue);
-//            }
-//
-//            for (Date date : dateItemsMap.keySet()) {
-//                allItems.add(date);
-//                allItems.addAll(dateItemsMap.get(date));
-//            }
-//        }
+        if (wrappedAdapter.getItemCount() > 0) {
+
+            Map<Date, Set<IssueWithComments>> dateItemsMap = new TreeMap<>((date, t1) -> t1.compareTo(date));
+            allItems.clear();
+            wrappedItems.clear();
+
+            for (int position = 0; position < wrappedAdapter.getItemCount(); position++) {
+                IssueWithComments issueWithComments = wrappedAdapter.getItem(position);
+                Date date = dateUtils.removeTime(issueWithComments.getIssue().getCreatedAt());
+                Set<IssueWithComments> currentSet = dateItemsMap.get(date);
+                if (currentSet == null) {
+                    currentSet = new LinkedHashSet<>();
+                    dateItemsMap.put(date, currentSet);
+                }
+                currentSet.add(issueWithComments);
+                wrappedItems.add(issueWithComments);
+            }
+
+            for (Date date : dateItemsMap.keySet()) {
+                allItems.add(date);
+                allItems.addAll(dateItemsMap.get(date));
+            }
+        }
     }
 
 
@@ -154,6 +157,20 @@ public class GroupByDateAdapter extends RecyclerView.Adapter {
         super.unregisterAdapterDataObserver(observer);
         wrappedAdapter.unregisterAdapterDataObserver(wrappedAdapterObserver);
         adapterDataObserver = null;
+    }
+
+    @Override
+    public void submitList(List list) {
+        wrappedAdapter.submitList(list);
+        prepareData();
+        super.submitList(allItems);
+    }
+
+    @Override
+    public void clear() {
+        wrappedAdapter.clear();
+        allItems.clear();
+        super.clear();
     }
 
     static final class DateViewHolder extends RecyclerView.ViewHolder{

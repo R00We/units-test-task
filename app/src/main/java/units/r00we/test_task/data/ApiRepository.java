@@ -1,5 +1,7 @@
 package units.r00we.test_task.data;
 
+import android.util.Log;
+
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -9,6 +11,8 @@ import units.r00we.test_task.data.entity.Issue;
 import units.r00we.test_task.data.entity.IssueWithComments;
 
 public class ApiRepository implements IApiRepository {
+
+    public static final String TAG = "Logger-ApiRepository";
 
     private final String user;
     private final String repository;
@@ -23,11 +27,13 @@ public class ApiRepository implements IApiRepository {
 
     @Override
     public Single<List<Issue>> getIssueList(int page, String state) {
+        Log.d(TAG, "getIssueList, page - "+page);
         return apiService.getIssueList(user,repository,page, state);
     }
 
     @Override
     public Single<List<Comment>> getCommentList(int issueNumber) {
+        Log.d(TAG, "getCommentList, issueNumber - "+issueNumber);
         return apiService.getCommentList(user, repository, issueNumber);
     }
 

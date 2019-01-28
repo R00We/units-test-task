@@ -32,22 +32,17 @@ public class IssueListActivity extends BaseActivity implements IssueListContract
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(layoutManager);
 
-        swipeRefreshLayout = findViewById(R.id.swipeToRefresh);
-
         scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                // Triggered only when new data needs to be appended to the list
-                // Add whatever code is needed to append new items to the bottom of the list
-                presenter.onLoadPage(page);
+            public void onLoadMore(int totalItemsCount, RecyclerView view) {
+                presenter.onLoadPage();
             }
         };
 
         recyclerView.addOnScrollListener(scrollListener);
 
+        swipeRefreshLayout = findViewById(R.id.swipeToRefresh);
         swipeRefreshLayout.setOnRefreshListener(() -> presenter.onRefresh());
-
-
     }
 
     @Override
@@ -73,7 +68,7 @@ public class IssueListActivity extends BaseActivity implements IssueListContract
 
     @Override
     protected void onPause() {
-        super.onPause();
         presenter.unbind();
+        super.onPause();
     }
 }

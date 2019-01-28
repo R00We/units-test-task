@@ -15,12 +15,9 @@ import java.util.List;
 import units.r00we.test_task.R;
 import units.r00we.test_task.data.entity.IssueWithComments;
 import units.r00we.test_task.ui.view.IssueView;
+import units.r00we.test_task.utils.CustomListAdapter;
 
-public class IssueAdapter extends ListAdapter<IssueWithComments, IssueView> {
-
-    public IssueAdapter(@NonNull DiffUtil.ItemCallback<IssueWithComments> diffCallback) {
-        super(diffCallback);
-    }
+public class IssueAdapter extends CustomListAdapter<IssueWithComments, IssueView> {
 
     @NonNull
     @Override
@@ -36,7 +33,6 @@ public class IssueAdapter extends ListAdapter<IssueWithComments, IssueView> {
             holder.fill(issue);
         }
     }
-
 
 }
 

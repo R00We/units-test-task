@@ -13,7 +13,10 @@ import units.r00we.test_task.Constants;
 import units.r00we.test_task.data.ApiRepository;
 import units.r00we.test_task.ui.IssueListContract;
 import units.r00we.test_task.data.entity.CommentsAdapter;
+import units.r00we.test_task.ui.presenter.GroupByDateAdapter;
+import units.r00we.test_task.ui.presenter.IssueAdapter;
 import units.r00we.test_task.ui.presenter.IssueListPresenter;
+import units.r00we.test_task.utils.CustomListAdapter;
 import units.r00we.test_task.utils.DateFormatter;
 
 @Module
@@ -46,15 +49,20 @@ public class PresentationModule {
     }
 
     @Provides
-    CommentsAdapter getCommentsAdapter(ApiRepository apiRepository){
+    CommentsAdapter getCommentsAdapter(){
         return new CommentsAdapter(Constants.NEED_COLLAPSED_SIZE,Constants.SIZE_IF_COLLAPSED);
     }
 
     @Provides
+    CustomListAdapter getCustomListAdapter(DateFormatter dateFormatter){
+        return new GroupByDateAdapter(new IssueAdapter(), dateFormatter);
+    }
+
+    @Provides
     IssueListContract.Presenter getIssueListPresenter(CompositeDisposable compositeDisposable,
-                                                      DateFormatter dateFormatter,
+                                                      CustomListAdapter customListAdapter,
                                                       ApiRepository apiRepository) {
-        return new IssueListPresenter(compositeDisposable, dateFormatter, apiRepository);
+        return new IssueListPresenter(compositeDisposable, apiRepository, customListAdapter);
     }
 
     @Provides
