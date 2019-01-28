@@ -27,8 +27,6 @@ public class IssueView extends RecyclerView.ViewHolder {
     private final RecyclerView commentsRecyclerView;
 
     @Inject
-    ApiRepository apiRepository;
-    @Inject
     Resources resources;
     @Inject
     LinearLayoutManager layoutManager;

@@ -11,6 +11,7 @@ import dagger.Provides;
 import io.reactivex.disposables.CompositeDisposable;
 import units.r00we.test_task.Constants;
 import units.r00we.test_task.data.ApiRepository;
+import units.r00we.test_task.data.IApiRepository;
 import units.r00we.test_task.ui.IssueListContract;
 import units.r00we.test_task.data.entity.CommentsAdapter;
 import units.r00we.test_task.ui.presenter.GroupByDateAdapter;
@@ -61,7 +62,7 @@ public class PresentationModule {
     @Provides
     IssueListContract.Presenter getIssueListPresenter(CompositeDisposable compositeDisposable,
                                                       CustomListAdapter customListAdapter,
-                                                      ApiRepository apiRepository) {
+                                                      IApiRepository apiRepository) {
         return new IssueListPresenter(compositeDisposable, apiRepository, customListAdapter);
     }
 
