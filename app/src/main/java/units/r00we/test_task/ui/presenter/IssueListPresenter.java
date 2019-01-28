@@ -46,7 +46,7 @@ public class IssueListPresenter implements IssueListContract.Presenter {
 
     @Override
     public void unbind() {
-        compositeDisposable.dispose();
+        compositeDisposable.clear();
         view = null;
     }
 
