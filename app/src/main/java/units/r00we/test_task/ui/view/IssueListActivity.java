@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
 
 import javax.inject.Inject;
 
@@ -49,6 +50,11 @@ public class IssueListActivity extends BaseActivity implements IssueListContract
     @Override
     public void showLoadingState() {
         swipeRefreshLayout.setRefreshing(true);
+    }
+
+    @Override
+    public void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
