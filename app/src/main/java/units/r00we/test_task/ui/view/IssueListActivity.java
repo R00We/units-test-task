@@ -1,7 +1,5 @@
 package units.r00we.test_task.ui.view;
 
-import android.arch.paging.PagedListAdapter;
-import android.arch.paging.RxPagedListBuilder;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

@@ -4,6 +4,7 @@ import android.arch.paging.DataSource;
 import android.arch.paging.PagedList;
 import android.arch.paging.PagedListAdapter;
 import android.arch.paging.RxPagedListBuilder;
+import android.content.res.Resources;
 import android.support.v7.util.DiffUtil;
 
 import javax.inject.Named;
@@ -32,8 +33,9 @@ public class PagingModule {
     IssueListContract.Presenter getIssueListPresenter(CompositeDisposable compositeDisposable,
                                                       RxPagedListBuilder<Integer, Issue> rxPagedListBuilder,
                                                       PagedListAdapter<Issue, IssueView> issueAdapter,
+                                                      Resources resources,
                                                       DateFormatter dateFormatter) {
-        return new IssueListPresenter(compositeDisposable, rxPagedListBuilder, issueAdapter, dateFormatter);
+        return new IssueListPresenter(compositeDisposable, rxPagedListBuilder, issueAdapter, resources, dateFormatter);
     }
 
     @Provides
