@@ -1,10 +1,14 @@
 package units.r00we.test_task.ui.presenter;
 
+import android.content.res.Resources;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import units.r00we.test_task.Constants;
+import units.r00we.test_task.R;
 import units.r00we.test_task.data.ApiRepository;
 import units.r00we.test_task.data.IApiRepository;
 import units.r00we.test_task.ui.IssueListContract;
@@ -18,6 +22,7 @@ public class IssueListPresenter implements IssueListContract.Presenter {
 
     private final CompositeDisposable compositeDisposable;
     private final IApiRepository apiRepository;
+    private final Resources resources;
 
 
     private final CustomListAdapter customListAdapter;
@@ -28,18 +33,24 @@ public class IssueListPresenter implements IssueListContract.Presenter {
 
     public IssueListPresenter(CompositeDisposable compositeDisposable,
                               IApiRepository apiRepository,
+                              Resources resources,
                               CustomListAdapter customListAdapter) {
         this.compositeDisposable = compositeDisposable;
         this.apiRepository = apiRepository;
+        this.resources = resources;
         this.customListAdapter = customListAdapter;
     }
 
     @Override
     public void bind(IssueListContract.View view) {
         this.view = view;
-        if (page == 0) {
-            view.setAdapter(customListAdapter);
-            onLoadPage();
+        if (TextUtils.isEmpty(Constants.TOKEN)) {
+            view.showMessage(resources.getString(R.string.github_token_issue));
+        } else {
+            if (page == 0) {
+                view.setAdapter(customListAdapter);
+                onLoadPage();
+            }
         }
     }
 

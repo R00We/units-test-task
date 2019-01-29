@@ -5,7 +5,10 @@ public class Constants {
     public static final String BASE_URL = "https://api.github.com/";
     public static final String USER = "ReactiveX";
     public static final String REPOSITORY = "RxAndroid";
-    public static final String TOKEN = "6551a91d3e9c196a4c0d842734ba7e4268d3bf25";
+    // Github анулирует токен если выложить его в открытый доступ.
+    // Поэтому перед запуском приложения нужно сходить на https://github.com/settings/tokens
+    // получить его и вписать в TOKEN
+    public static final String TOKEN = "";
 
     //Comments settings
     public static final int NEED_COLLAPSED_SIZE = 3;

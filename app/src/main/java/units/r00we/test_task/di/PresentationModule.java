@@ -62,8 +62,9 @@ public class PresentationModule {
     @Provides
     IssueListContract.Presenter getIssueListPresenter(CompositeDisposable compositeDisposable,
                                                       CustomListAdapter customListAdapter,
+                                                      Resources resources,
                                                       IApiRepository apiRepository) {
-        return new IssueListPresenter(compositeDisposable, apiRepository, customListAdapter);
+        return new IssueListPresenter(compositeDisposable, apiRepository,resources, customListAdapter);
     }
 
     @Provides
